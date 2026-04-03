@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lumo Advisory | Alta Performance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #030811; /* Fundo levemente mais azulado escuro */
+            --assistant-bg: rgba(15, 25, 45, 0.92);
+            --user-bg: rgba(25, 45, 80, 0.85);
+            --accent-blue: #0055ff;
+            --accent-silver: #c0c0c0;
+            --text-main: #FFFFFF;
+            --text-dim: #A0B0C0;
+            --gradient-primary: linear-gradient(90deg, #0033cc, #0066ff);
+            
+            --metallic-silver: linear-gradient(
+                135deg, 
+                #f0f0f0 0%, 
+                #808080 20%, 
+                #e0e0e0 40%, 
+                #ffffff 50%, 
+                #a0a0a0 60%, 
+                #dcdcdc 80%, 
+                #f0f0f0 100%
+            );
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.7;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+        }
+
+        #galaxy-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: #010308;
+        }
+
+        header {
+            padding: 25px 15px;
+            text-align: center;
+            background: rgba(3, 8, 17, 0.75);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+
+        header h1 {
+            font-weight: 800;
+            font-size: 1.6rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: var(--metallic-silver);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0px 3px 5px rgba(0,0,0,0.6));
+            animation: silver-shine 6s linear infinite;
+            line-height: 1.2;
+            display: inline-block;
+        }
+
+        @keyframes silver-shine {
+            to { background-position: 200% center; }
+        }
+
+        header p {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 6px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 20px;
+            max-width: 850px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            z-index: 10;
+            scrollbar-width: none;
+            padding-bottom: 220px; 
+        }
+
+        #chat-container::-webkit-scrollbar { display: none; }
+
+        .message {
+            max-width: 85%;
+            padding: 24px 30px;
+            font-size: 1rem;
+            animation: fadeIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            word-wrap: break-word;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .assistant {
+            align-self: flex-start;
+            background-color: var(--assistant-bg);
+            border-radius: 4px 28px 28px 28px;
+            border-left: 5px solid var(--accent-silver);
+            color: #f8f8f8;
+        }
+
+        .user {
+            align-self: flex-end;
+            background-color: var(--user-bg);
+            border-radius: 28px 28px 4px 28px;
+            border-right: 5px solid var(--accent-blue);
+            color: #fff;
+        }
+
+        /* BARRA DE INPUT */
+        .input-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, var(--bg-color) 80%, transparent);
+            padding: 20px 20px 45px 20px;
+            z-index: 100;
+        }
+
+        .input-wrapper {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(10, 20, 40, 0.98);
+            padding: 10px 10px 10px 26px;
+            border-radius: 50px;
+            border: 1px solid rgba(192, 192, 192, 0.25);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.7);
+            backdrop-filter: blur(30px);
+        }
+
+        input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 12px 0;
+            font-size: 1.1rem;
+            outline: none;
+            min-width: 0;
+        }
+
+        button#send-btn {
+            background: var(--metallic-silver);
+            border: none;
+            color: #001133;
+            height: 52px;
+            padding: 0 32px;
+            border-radius: 40px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            flex-shrink: 0;
+        }
+        
+        button#send-btn:active {
+            transform: scale(0.94);
+            filter: brightness(0.9);
+        }
+
+        /* MOBILE OPTIMIZATION */
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.3rem; }
+            #chat-container { 
+                padding: 30px 18px 240px 18px; 
+                gap: 25px; 
+            }
+            .message { 
+                max-width: 92%;
+                font-size: 1rem; 
+                padding: 20px 24px;
+                line-height: 1.6;
+            }
+            .assistant { border-left-width: 4px; }
+            .user { border-right-width: 4px; }
+            
+            button#send-btn { padding: 0 20px; font-size: 0.75rem; height: 48px; }
+            .input-area { padding: 15px 15px 30px 15px; }
+            .input-wrapper { padding-left: 20px; }
+
+            #final-cta {
+                padding: 35px 20px;
+                margin-top: 10px;
+            }
+        }
+
+        /* CTA FINAL */
+        #final-cta {
+            background: rgba(10, 15, 30, 0.95);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            border-radius: 30px;
+            padding: 45px 30px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none; /* Começa oculto */
+            backdrop-filter: blur(30px);
+            box-shadow: 0 25px 70px rgba(0, 85, 255, 0.2);
+            width: 100%;
+            max-width: 100%;
+            animation: fadeIn 0.8s ease-out forwards;
+            align-self: center;
+        }
+
+        .cta-title { 
+            font-weight: 800; 
+            font-size: 1.6rem; 
+            margin-bottom: 12px;
+            background: var(--metallic-silver);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .benefits { text-align: left; margin: 25px 0; font-size: 0.95rem; list-style: none; display: inline-block; }
+        .benefits li { margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+        .benefits span { color: var(--accent-blue); }
+        .price .old { text-decoration: line-through; color: #777; font-size: 0.9rem; }
+        .price .new { color: #fff; font-weight: 800; font-size: 2.2rem; display: block; margin: 10px 0; }
+
+        .nexus-btn {
+            display: block;
+            width: 100%;
+            padding: 22px;
+            background: var(--gradient-primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            box-shadow: 0 12px 45px rgba(0, 102, 255, 0.45);
+            transition: all 0.4s;
+            cursor: pointer;
+        }
+
+        .nexus-btn:hover { transform: translateY(-2px); filter: brightness(1.2); box-shadow: 0 15px 55px rgba(0, 102, 255, 0.6); }
+        .nexus-btn:active { transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <canvas id="galaxy-bg"></canvas>
+
+    <header>
+        <h1>Lumo Advisory</h1>
+        <p>Crescimento • Inteligência • Previsibilidade</p>
+    </header>
+
+    <main id="chat-container">
+        <!-- Mensagens serão inseridas aqui via JS -->
+        
+        <!-- CTA FINAL -->
+        <div id="final-cta">
+            <div class="cta-title">SISTEMA LIBERADO 🔓</div>
+            <p style="color: #bbb; font-size: 0.95rem;">Acesse o manual operacional de inteligência e performance.</p>
+            <ul class="benefits">
+                <li><span>🔷</span> <strong>Estrutura de Elite</strong> pré-configurada</li>
+                <li><span>🔷</span> <strong>Automação & Escala</strong> com metodologias validadas</li>
+                <li><span>🔷</span> <strong>Máquina de Vendas</strong> com previsibilidade</li>
+            </ul>
+            <div class="price">
+                <span class="old">De R$ 97,00</span>
+                <span class="new">R$ 47,00</span>
+            </div>
+            <a href="https://nexus-manual.com.br" target="_blank" class="nexus-btn">ACESSAR O MANUAL 🚀</a>
+        </div>
+    </main>
+
+    <div class="input-area" id="input-container">
+        <div class="input-wrapper">
+            <input type="text" id="user-input" placeholder="Digite sua resposta..." autocomplete="off">
+            <button id="send-btn">ENVIAR</button>
+        </div>
+    </div>
+
+    <script>
+        // --- THREE.JS GALAXY ENGINE (AZUL E PRATA) ---
+        const canvas = document.getElementById('galaxy-bg');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = 4.5;
+        camera.position.y = 1.0;
+        camera.rotation.x = -0.25;
+
+        const parameters = {
+            count: 35000,
+            size: 0.008,
+            radius: 5,
+            branches: 3,
+            spin: 1.2,
+            randomness: 0.4,
+            randomnessPower: 3,
+            insideColor: '#0066ff',  // Azul profundo/luminoso
+            outsideColor: '#e0e0e0'  // Prata/Branco
+        };
+
+        let geometry, material, points;
+
+        const generateGalaxy = () => {
+            geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(parameters.count * 3);
+            const colors = new Float32Array(parameters.count * 3);
+            const colorInside = new THREE.Color(parameters.insideColor);
+            const colorOutside = new THREE.Color(parameters.outsideColor);
+
+            for(let i = 0; i < parameters.count; i++) {
+                const i3 = i * 3;
+                const radius = Math.random() * parameters.radius;
+                const spinAngle = radius * parameters.spin;
+                const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2;
+
+                const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+                const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+                const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+
+                positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
+                positions[i3 + 1] = randomY * 0.4;
+                positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+
+                const mixedColor = colorInside.clone();
+                mixedColor.lerp(colorOutside, radius / parameters.radius);
+                colors[i3] = mixedColor.r;
+                colors[i3 + 1] = mixedColor.g;
+                colors[i3 + 2] = mixedColor.b;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            material = new THREE.PointsMaterial({
+                size: parameters.size,
+                sizeAttenuation: true,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending,
+                vertexColors: true
+            });
+
+            points = new THREE.Points(geometry, material);
+            scene.add(points);
+        };
+
+        generateGalaxy();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        const clock = new THREE.Clock();
+        const animate = () => {
+            const elapsedTime = clock.getElapsedTime();
+            points.rotation.y = elapsedTime * 0.05;
+            renderer.render(scene, camera);
+            window.requestAnimationFrame(animate);
+        };
+        animate();
+
+        // --- CHAT LOGIC PARA CAPTAÇÃO LUMO ---
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const finalCta = document.getElementById('final-cta');
+        const inputContainer = document.getElementById('input-container');
+
+        let step = 0;
+        let userName = "";
+
+        async function typeText(text, element) {
+            const words = text.split(" ");
+            let currentText = "";
+            for (const word of words) {
+                currentText += word + " ";
+                element.innerHTML = currentText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                await new Promise(resolve => setTimeout(resolve, 20));
+            }
+        }
+
+        async function addMessage(text, role) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', role);
+            
+            // GARANTE QUE A MENSAGEM SEJA INSERIDA SEMPRE ANTES DO CTA FINAL
+            chatContainer.insertBefore(msgDiv, finalCta);
+            
+            if (role === 'assistant') await typeText(text, msgDiv);
+            else msgDiv.innerText = text;
+            
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function extrairNome(input) {
+            const patterns = [/(?:nome é|sou o|sou a|me chamo)\s*([A-Za-zÀ-ÿ]+)/i, /^([A-Za-zÀ-ÿ]{3,})/i];
+            for (let p of patterns) {
+                const m = input.match(p);
+                if (m && m[1]) return m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase();
+            }
+            return "";
+        }
+
+        function getFluxo(step) {
+            const fluxos = {
+                1: `Prazer, **${userName}**! Seja bem-vindo à **Lumo Advisory**.\n\nNós ajudamos empresas a saírem do "achismo" e construírem operações de marketing baseadas em dados.\n\nHoje, qual é o seu maior desafio: atrair novos leads ou convertê-los em clientes reais?`,
+                2: `Excelente ponto. A falta de processos afeta diretamente o custo de aquisição.\n\nNa sua estratégia atual, você já utiliza tráfego pago de forma estruturada ou ainda atua mais no orgânico?`,
+                3: `Entendo o cenário.\n\nNa Lumo, nós desenvolvemos **Ecossistemas de Alta Performance**. Em vez de ações isoladas, criamos uma máquina previsível unindo tráfego, automação e inteligência de vendas.\n\nFaria sentido para você ter acesso a um modelo já validado pelo mercado?`,
+                4: `Isso é o que diferencia empresas comuns de líderes de mercado.\n\nPara facilitar sua jornada, liberamos o acesso a um material exclusivo: nosso **Manual Operacional** detalhando essas estruturas.\n\nPosso liberar o seu convite de acesso?`,
+                5: `Maravilha. Ao aplicar a metodologia apresentada lá, você não apenas melhora seu marketing, você transforma o seu negócio em um ativo escalável.\n\nPronto para descobrir como fazemos isso?`,
+                6: `Seja muito bem-vindo ao próximo nível, **${userName}**.\n\nSeu acesso prioritário ao manual está liberado logo abaixo.`
+            };
+            return fluxos[step];
+        }
+
+        async function handleSend() {
+            const text = userInput.value.trim();
+            if (!text) return;
+            userInput.value = "";
+            await addMessage(text, 'user');
+
+            if (step === 0) {
+                const nome = extrairNome(text);
+                if (nome) {
+                    userName = nome; step = 1;
+                    await addMessage(getFluxo(1), 'assistant');
+                } else {
+                    await addMessage("Entendido. Mas como posso te chamar para prosseguirmos de forma mais próxima?", 'assistant');
+                }
+            } else {
+                step++;
+                const resp = getFluxo(step);
+                if (resp) {
+                    await addMessage(resp, 'assistant');
+                    if (step >= 6) {
+                        inputContainer.style.opacity = '0';
+                        setTimeout(() => {
+                            inputContainer.style.display = 'none';
+                            finalCta.style.display = 'block';
+                            
+                            setTimeout(() => {
+                                chatContainer.scrollTo({
+                                    top: chatContainer.scrollHeight,
+                                    behavior: 'smooth'
+                                });
+                            }, 300);
+                        }, 1000);
+                    }
+                }
+            }
+        }
+
+        sendBtn.addEventListener('click', handleSend);
+        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
+
+        window.onload = async () => {
+            await new Promise(r => setTimeout(r, 800));
+            await addMessage("👋 Olá! Sou o assistente de inteligência da **Lumo Advisory**.\n\nComo posso te chamar para darmos início?", 'assistant');
+        };
+    </script>
+</body>
+</html>
