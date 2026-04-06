@@ -1,0 +1,411 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Frequência Mental Poderosa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --primary: #00f2ff;
+            --bg-dark: #020617;
+            --glass: rgba(15, 23, 42, 0.85);
+            --border: rgba(0, 242, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            color: #ffffff;
+        }
+
+        /* Canvas Background */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Layout Structure */
+        .app-wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: -webkit-fill-available;
+        }
+
+        header {
+            padding: 24px 16px;
+            text-align: center;
+            background: linear-gradient(to bottom, rgba(2, 6, 23, 0.9), transparent);
+            flex-shrink: 0;
+        }
+
+        .brand {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .title {
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Chat Container */
+        #chat-flow {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scroll-behavior: smooth;
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+
+        .bubble {
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 22px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+            animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .bubble.ai {
+            align-self: flex-start;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+            color: #e2e8f0;
+        }
+
+        .bubble.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #0066ff 0%, #3a7bd5 100%);
+            color: #ffffff;
+            font-weight: 600;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
+        }
+
+        .typing::after {
+            content: '';
+            width: 2px;
+            height: 14px;
+            background: var(--primary);
+            display: inline-block;
+            margin-left: 4px;
+            vertical-align: middle;
+            animation: blink 0.8s infinite;
+        }
+
+        /* Interaction Zone */
+        .interaction-zone {
+            padding: 16px;
+            padding-bottom: calc(16px + env(safe-area-inset-bottom));
+            background: rgba(2, 6, 23, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-pill {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            padding: 14px 20px;
+            color: #fff;
+            font-size: 16px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .input-pill:focus {
+            border-color: var(--primary);
+        }
+
+        .send-trigger {
+            background: #0066ff;
+            color: #ffffff;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Final CTA */
+        #cta-wrapper {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+            width: 100%;
+        }
+
+        .final-button {
+            display: inline-block;
+            background: #ffffff;
+            color: #020617;
+            padding: 18px 36px;
+            border-radius: 40px;
+            font-weight: 900;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes blink { 50% { opacity: 0; } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        #chat-flow::-webkit-scrollbar { width: 0; }
+    </style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<div class="app-wrapper">
+    <header>
+        <div class="brand">Protocolo</div>
+        <div class="title">Frequência Mental Poderosa</div>
+    </header>
+
+    <div id="chat-flow">
+        <div id="cta-wrapper">
+            <a href="https://frequencia.nexus-manual.com.br" class="final-button">Acessar o Portal</a>
+        </div>
+    </div>
+
+    <div class="interaction-zone" id="input-container">
+        <input type="text" id="user-input" class="input-pill" placeholder="Escreva aqui..." autocomplete="off">
+        <button class="send-trigger" id="send-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+    </div>
+</div>
+
+<script>
+    /** * PROCEDURAL SPIRAL GALAXY (THREE.JS)
+     */
+    const parameters = {
+        count: 35000,
+        size: 0.008,
+        radius: 5,
+        branches: 3,
+        spin: 1.2,
+        randomness: 0.4,
+        randomnessPower: 3,
+        insideColor: '#0066ff',
+        outsideColor: '#e0e0e0'
+    };
+
+    let scene, camera, renderer, points, geometry, material;
+
+    const initGalaxy = () => {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+        
+        // Câmera conforme especificações
+        camera.position.z = 4.5;
+        camera.position.y = 1.0;
+        camera.rotation.x = -0.25;
+
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        if(points) {
+            geometry.dispose();
+            material.dispose();
+            scene.remove(points);
+        }
+
+        geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(parameters.count * 3);
+        const colors = new Float32Array(parameters.count * 3);
+
+        const colorInside = new THREE.Color(parameters.insideColor);
+        const colorOutside = new THREE.Color(parameters.outsideColor);
+
+        for (let i = 0; i < parameters.count; i++) {
+            const i3 = i * 3;
+
+            // Posição
+            const radius = Math.random() * parameters.radius;
+            const spinAngle = radius * parameters.spin;
+            const branchAngle = ((i % parameters.branches) / parameters.branches) * Math.PI * 2;
+
+            const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+            const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+            const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+
+            positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
+            positions[i3 + 1] = randomY;
+            positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+
+            // Cor
+            const mixedColor = colorInside.clone();
+            mixedColor.lerp(colorOutside, radius / parameters.radius);
+
+            colors[i3] = mixedColor.r;
+            colors[i3 + 1] = mixedColor.g;
+            colors[i3 + 2] = mixedColor.b;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        material = new THREE.PointsMaterial({
+            size: parameters.size,
+            sizeAttenuation: true,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            vertexColors: true
+        });
+
+        points = new THREE.Points(geometry, material);
+        scene.add(points);
+    };
+
+    const clock = new THREE.Clock();
+
+    const animate = () => {
+        const elapsedTime = clock.getElapsedTime();
+        
+        // Rotação conforme especificações
+        if(points) points.rotation.y = elapsedTime * 0.05;
+
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+    };
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    initGalaxy();
+    animate();
+
+    /**
+     * CHAT LOGIC
+     */
+    const chatFlow = document.getElementById('chat-flow');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const ctaWrapper = document.getElementById('cta-wrapper');
+    const inputContainer = document.getElementById('input-container');
+
+    let currentStep = 0;
+    let userName = "";
+
+    async function addMessage(content, sender) {
+        const bubble = document.createElement('div');
+        bubble.className = `bubble ${sender}`;
+        chatFlow.insertBefore(bubble, ctaWrapper);
+        
+        if(sender === 'ai') {
+            bubble.classList.add('typing');
+            let i = 0;
+            while(i < content.length) {
+                bubble.innerHTML += content.charAt(i);
+                i++;
+                chatFlow.scrollTop = chatFlow.scrollHeight;
+                await new Promise(resolve => setTimeout(resolve, 15));
+            }
+            bubble.classList.remove('typing');
+        } else {
+            bubble.textContent = content;
+            chatFlow.scrollTop = chatFlow.scrollHeight;
+        }
+    }
+
+    const script = [
+        (name) => `Muito prazer em conhecer, ${name}. Agora me conta, já sentiu que a tua mente está cheia de ruído que te impede de ver o teu verdadeiro potencial?`,
+        () => `Pois é, muitas pessoas tentam resolver isso com esforço, mas a verdade é que se trata de sintonização da sua energia. Já ouviu falar em frequências cerebrais?`,
+        () => `Exatamente. O que estamos fazendo aqui é recalibrar a tua frequência básica. Estás pronto para um choque de realidade que pode mudar completamente a sua vida?`,
+        () => `Ótimo. O último passo é deixar para trás as crenças limitantes. Aceita o desafio de te tornares a versão mais poderosa de ti mesmo?`,
+        () => `A sintonização está completa. Acesse nosso conteúdo e faça parte dessa nova transformação.`
+    ];
+
+    async function handleInteraction() {
+        const text = userInput.value.trim();
+        if(!text) return;
+        userInput.value = "";
+        await addMessage(text, 'user');
+
+        if(currentStep === 0) {
+            userName = text.split(' ')[0];
+            currentStep = 1;
+            await addMessage(`Seja bem-vindo, ${userName}. Vamos iniciar o processo de sintonização.`, 'ai');
+            await new Promise(r => setTimeout(r, 600));
+        }
+
+        if(currentStep <= script.length) {
+            const nextMsg = script[currentStep - 1](userName);
+            await addMessage(nextMsg, 'ai');
+            currentStep++;
+            
+            if(currentStep > script.length) {
+                inputContainer.style.display = 'none';
+                ctaWrapper.style.display = 'block';
+                chatFlow.scrollTop = chatFlow.scrollHeight;
+            }
+        }
+    }
+
+    sendBtn.addEventListener('click', handleInteraction);
+    userInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleInteraction());
+
+    window.onload = async () => {
+        await new Promise(r => setTimeout(r, 800));
+        await addMessage("Olá. Para começarmos a sintonizar a tua Frequência Mental Poderosa, diz-me: como te chamas?", "ai");
+    };
+</script>
+
+</body>
+</html>
+
+```
