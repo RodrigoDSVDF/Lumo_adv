@@ -2,12 +2,11 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Lumo Advisory | Alta Performance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-<!-- Three.js Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 :root {
@@ -15,20 +14,10 @@
 --assistant-bg: rgba(15, 25, 45, 0.92);
 --user-bg: rgba(25, 45, 80, 0.85);
 --accent-blue: #0055ff;
---accent-silver: #c0c0c0;
 --text-main: #FFFFFF;
 --text-dim: #A0B0C0;
 --gradient-primary: linear-gradient(90deg, #0033cc, #0066ff);
---metallic-silver: linear-gradient(
-135deg, 
-#f0f0f0 0%, 
-#808080 20%, 
-#e0e0e0 40%, 
-#ffffff 50%, 
-#a0a0a0 60%, 
-#dcdcdc 80%, 
-#f0f0f0 100%
-);
+--metallic-silver: linear-gradient(135deg, #f0f0f0 0%, #808080 20%, #e0e0e0 40%, #ffffff 50%, #a0a0a0 60%, #dcdcdc 80%, #f0f0f0 100%);
 }
 
 * {
@@ -42,12 +31,15 @@ body {
 font-family: 'Inter', sans-serif;
 background-color: var(--bg-color);
 color: var(--text-main);
-line-height: 1.7;
+line-height: 1.6;
 overflow: hidden;
 display: flex;
 flex-direction: column;
 height: 100vh;
-position: relative;
+width: 100%;
+position: fixed;
+top: 0;
+left: 0;
 }
 
 #galaxy-bg {
@@ -61,9 +53,9 @@ background: #010308;
 }
 
 header {
-padding: 25px 15px;
+padding: 20px 15px;
 text-align: center;
-background: rgba(3, 8, 17, 0.75);
+background: rgba(3, 8, 17, 0.85);
 backdrop-filter: blur(20px);
 z-index: 100;
 border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -71,7 +63,7 @@ flex-shrink: 0;
 }
 
 .logo {
-font-size: 1.5rem;
+font-size: 1.3rem;
 font-weight: 800;
 background: var(--metallic-silver);
 -webkit-background-clip: text;
@@ -81,28 +73,29 @@ letter-spacing: 2px;
 }
 
 .sub {
-font-size: 0.75rem;
+font-size: 0.7rem;
 color: var(--text-dim);
-letter-spacing: 3px;
-margin-top: 5px;
+letter-spacing: 2px;
+margin-top: 4px;
 }
 
 .chat-messages {
 flex: 1;
 overflow-y: auto;
-padding: 20px;
+padding: 16px;
 display: flex;
 flex-direction: column;
-gap: 16px;
+gap: 12px;
 scroll-behavior: smooth;
+-webkit-overflow-scrolling: touch;
 }
 
 .message {
-max-width: 85%;
-padding: 14px 18px;
-border-radius: 24px;
-font-size: 0.95rem;
-line-height: 1.5;
+max-width: 90%;
+padding: 12px 16px;
+border-radius: 20px;
+font-size: 0.9rem;
+line-height: 1.45;
 animation: fadeIn 0.3s ease;
 word-wrap: break-word;
 }
@@ -131,12 +124,13 @@ color: white;
 }
 
 .input-area {
-padding: 16px;
-background: rgba(3, 8, 17, 0.9);
+padding: 12px 16px;
+padding-bottom: max(12px, env(safe-area-inset-bottom));
+background: rgba(3, 8, 17, 0.95);
 backdrop-filter: blur(20px);
 border-top: 1px solid rgba(255,255,255,0.05);
 display: flex;
-gap: 12px;
+gap: 10px;
 align-items: center;
 flex-shrink: 0;
 }
@@ -145,13 +139,14 @@ flex-shrink: 0;
 flex: 1;
 background: rgba(255,255,255,0.08);
 border: 1px solid rgba(255,255,255,0.15);
-border-radius: 40px;
-padding: 14px 20px;
+border-radius: 30px;
+padding: 12px 18px;
 color: white;
 font-family: 'Inter', sans-serif;
 font-size: 0.9rem;
 outline: none;
 transition: all 0.2s;
+min-width: 0;
 }
 
 .input-area input:focus {
@@ -162,18 +157,18 @@ background: rgba(255,255,255,0.12);
 .input-area button {
 background: var(--gradient-primary);
 border: none;
-border-radius: 40px;
-padding: 12px 24px;
+border-radius: 30px;
+padding: 10px 20px;
 color: white;
 font-weight: 600;
 cursor: pointer;
 transition: transform 0.2s, opacity 0.2s;
 font-family: 'Inter', sans-serif;
+flex-shrink: 0;
 }
 
-.input-area button:hover {
-transform: scale(1.02);
-opacity: 0.9;
+.input-area button:active {
+transform: scale(0.97);
 }
 
 .cta-button {
@@ -181,32 +176,30 @@ display: block;
 background: linear-gradient(135deg, #0055ff, #00aaff);
 border: none;
 border-radius: 60px;
-padding: 16px 32px;
-margin: 20px auto;
+padding: 16px 24px;
+margin: 16px auto;
 color: white;
 font-weight: 800;
-font-size: 1.2rem;
+font-size: 1.1rem;
 cursor: pointer;
 text-align: center;
 text-decoration: none;
 transition: all 0.3s ease;
 font-family: 'Inter', sans-serif;
 box-shadow: 0 0 20px rgba(0,85,255,0.4);
-width: 90%;
-max-width: 320px;
+width: 85%;
+max-width: 280px;
 letter-spacing: 1px;
 }
 
-.cta-button:hover {
-transform: scale(1.05);
-box-shadow: 0 0 30px rgba(0,85,255,0.6);
-background: linear-gradient(135deg, #0066ff, #00bbff);
+.cta-button:active {
+transform: scale(0.98);
 }
 
 .final-cta-container {
 display: none;
 text-align: center;
-padding: 20px;
+padding: 20px 16px;
 animation: fadeInUp 0.6s ease;
 }
 
@@ -221,7 +214,7 @@ to { opacity: 1; transform: translateY(0); }
 }
 
 ::-webkit-scrollbar {
-width: 5px;
+width: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -233,18 +226,31 @@ background: #0055ff;
 border-radius: 10px;
 }
 
+/* Ajustes específicos para mobile */
 @media (max-width: 600px) {
 .message {
-max-width: 90%;
+max-width: 95%;
 font-size: 0.85rem;
-padding: 12px 16px;
+padding: 10px 14px;
+}
+.logo {
+font-size: 1.1rem;
+}
+.sub {
+font-size: 0.6rem;
+}
+.input-area input {
+padding: 10px 14px;
+font-size: 0.85rem;
 }
 .input-area button {
-padding: 10px 18px;
+padding: 8px 16px;
+font-size: 0.85rem;
 }
 .cta-button {
 font-size: 1rem;
-padding: 14px 24px;
+padding: 14px 20px;
+width: 90%;
 }
 }
 
@@ -286,7 +292,7 @@ renderer.setClearColor(0x010308, 1);
 document.getElementById('galaxy-bg').appendChild(renderer.domElement);
 
 const geometry = new THREE.BufferGeometry();
-const particlesCount = 1800;
+const particlesCount = 1500;
 const positions = new Float32Array(particlesCount * 3);
 for (let i = 0; i < particlesCount; i++) {
 positions[i*3] = (Math.random() - 0.5) * 200;
@@ -294,7 +300,7 @@ positions[i*3+1] = (Math.random() - 0.5) * 100;
 positions[i*3+2] = (Math.random() - 0.5) * 100 - 50;
 }
 geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-const material = new THREE.PointsMaterial({ color: 0x88aaff, size: 0.15, transparent: true, opacity: 0.6 });
+const material = new THREE.PointsMaterial({ color: 0x88aaff, size: 0.12, transparent: true, opacity: 0.5 });
 const particles = new THREE.Points(geometry, material);
 scene.add(particles);
 
@@ -314,18 +320,16 @@ camera.updateProjectionMatrix();
 renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// --- NOVO SCRIPT DE ALTA PERFORMANCE COM BOTÃO FINAL ---
-
+// SCRIPT DE ALTA PERFORMANCE
 const chatContainer = document.getElementById('chat-container');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 const finalCtaDiv = document.getElementById('final-cta');
 const inputContainer = document.getElementById('input-container');
 
-let step = 0;
+let messageIndex = 0;
 let waitingForResponse = true;
 
-// Mensagens do novo script
 const highPerformanceMessages = [
     "Você já sentiu que poderia estar vivendo mais… mas não sabe exatamente o que está faltando?",
     "Já teve a sensação de que existe algo dentro de você… esperando para ser despertado?",
@@ -342,25 +346,20 @@ const highPerformanceMessages = [
     "Agora deixa eu te fazer uma pergunta diferente:\n\nE se você encontrasse uma oportunidade de descobrir algo que pudesse mudar tudo?\nAlgo capaz de criar um caos dentro de você…\nmas um caos necessário — aquele que destrói o que te limita para dar origem a uma nova versão sua."
 ];
 
-let messageIndex = 0;
-
 async function typeText(text, element) {
-    element.classList.add('assistant-message-text');
     const words = text.split(" ");
     let currentText = "";
     for (const word of words) {
         currentText += word + " ";
         element.innerHTML = currentText.replace(/\n/g, '<br>');
         chatContainer.scrollTop = chatContainer.scrollHeight;
-        await new Promise(resolve => setTimeout(resolve, 25));
+        await new Promise(resolve => setTimeout(resolve, 20));
     }
 }
 
 async function addMessage(text, role) {
     const msgDiv = document.createElement('div');
     msgDiv.classList.add('message', role);
-    
-    // Insere antes do CTA final
     chatContainer.insertBefore(msgDiv, finalCtaDiv);
     
     if (role === 'assistant') {
@@ -370,26 +369,20 @@ async function addMessage(text, role) {
     }
     
     chatContainer.scrollTop = chatContainer.scrollHeight;
-    return msgDiv;
 }
 
 async function sendNextMessage() {
     if (messageIndex < highPerformanceMessages.length) {
-        const msg = highPerformanceMessages[messageIndex];
-        await addMessage(msg, 'assistant');
+        await addMessage(highPerformanceMessages[messageIndex], 'assistant');
         messageIndex++;
         
-        // Se chegou ao fim, mostra o botão após pequeno delay
         if (messageIndex === highPerformanceMessages.length) {
             setTimeout(() => {
                 inputContainer.style.opacity = '0';
                 setTimeout(() => {
                     inputContainer.style.display = 'none';
                     finalCtaDiv.style.display = 'block';
-                    chatContainer.scrollTo({
-                        top: chatContainer.scrollHeight,
-                        behavior: 'smooth'
-                    });
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
                 }, 500);
             }, 1000);
         }
@@ -398,32 +391,34 @@ async function sendNextMessage() {
 
 async function handleUserResponse() {
     const text = userInput.value.trim();
-    if (!text) return;
-    if (!waitingForResponse) return;
+    if (!text || !waitingForResponse) return;
     
     userInput.value = "";
     await addMessage(text, 'user');
-    
     waitingForResponse = false;
     
-    // Pequena pausa antes da próxima mensagem automática
     setTimeout(() => {
         sendNextMessage();
         waitingForResponse = true;
-    }, 600);
+    }, 500);
 }
 
-// Event listeners
 sendBtn.addEventListener('click', handleUserResponse);
 userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') handleUserResponse();
 });
 
-// Inicia o fluxo automaticamente ao carregar
 window.onload = async () => {
-    await new Promise(r => setTimeout(r, 800));
+    await new Promise(r => setTimeout(r, 500));
     sendNextMessage();
 };
+
+// Força o scroll quando o teclado abre (mobile)
+window.addEventListener('resize', () => {
+    setTimeout(() => {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }, 100);
+});
 </script>
 
 </body>
