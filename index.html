@@ -31,7 +31,7 @@ body {
 font-family: 'Inter', sans-serif;
 background-color: var(--bg-color);
 color: var(--text-main);
-line-height: 1.6;
+line-height: 1.5;
 overflow: hidden;
 display: flex;
 flex-direction: column;
@@ -53,7 +53,7 @@ background: #010308;
 }
 
 header {
-padding: 20px 15px;
+padding: 16px 15px;
 text-align: center;
 background: rgba(3, 8, 17, 0.85);
 backdrop-filter: blur(20px);
@@ -63,7 +63,7 @@ flex-shrink: 0;
 }
 
 .logo {
-font-size: 1.3rem;
+font-size: 1.2rem;
 font-weight: 800;
 background: var(--metallic-silver);
 -webkit-background-clip: text;
@@ -73,10 +73,10 @@ letter-spacing: 2px;
 }
 
 .sub {
-font-size: 0.7rem;
+font-size: 0.65rem;
 color: var(--text-dim);
 letter-spacing: 2px;
-margin-top: 4px;
+margin-top: 3px;
 }
 
 .chat-messages {
@@ -85,17 +85,17 @@ overflow-y: auto;
 padding: 16px;
 display: flex;
 flex-direction: column;
-gap: 12px;
+gap: 10px;
 scroll-behavior: smooth;
 -webkit-overflow-scrolling: touch;
 }
 
 .message {
 max-width: 90%;
-padding: 12px 16px;
-border-radius: 20px;
-font-size: 0.9rem;
-line-height: 1.45;
+padding: 10px 14px;
+border-radius: 18px;
+font-size: 0.85rem;
+line-height: 1.4;
 animation: fadeIn 0.3s ease;
 word-wrap: break-word;
 }
@@ -124,13 +124,13 @@ color: white;
 }
 
 .input-area {
-padding: 12px 16px;
-padding-bottom: max(12px, env(safe-area-inset-bottom));
+padding: 10px 16px;
+padding-bottom: max(10px, env(safe-area-inset-bottom));
 background: rgba(3, 8, 17, 0.95);
 backdrop-filter: blur(20px);
 border-top: 1px solid rgba(255,255,255,0.05);
 display: flex;
-gap: 10px;
+gap: 8px;
 align-items: center;
 flex-shrink: 0;
 }
@@ -140,12 +140,11 @@ flex: 1;
 background: rgba(255,255,255,0.08);
 border: 1px solid rgba(255,255,255,0.15);
 border-radius: 30px;
-padding: 12px 18px;
+padding: 10px 16px;
 color: white;
 font-family: 'Inter', sans-serif;
-font-size: 0.9rem;
+font-size: 0.85rem;
 outline: none;
-transition: all 0.2s;
 min-width: 0;
 }
 
@@ -158,13 +157,13 @@ background: rgba(255,255,255,0.12);
 background: var(--gradient-primary);
 border: none;
 border-radius: 30px;
-padding: 10px 20px;
+padding: 8px 18px;
 color: white;
 font-weight: 600;
 cursor: pointer;
-transition: transform 0.2s, opacity 0.2s;
 font-family: 'Inter', sans-serif;
 flex-shrink: 0;
+font-size: 0.85rem;
 }
 
 .input-area button:active {
@@ -176,19 +175,16 @@ display: block;
 background: linear-gradient(135deg, #0055ff, #00aaff);
 border: none;
 border-radius: 60px;
-padding: 16px 24px;
+padding: 14px 20px;
 margin: 16px auto;
 color: white;
 font-weight: 800;
-font-size: 1.1rem;
-cursor: pointer;
+font-size: 1rem;
 text-align: center;
 text-decoration: none;
-transition: all 0.3s ease;
-font-family: 'Inter', sans-serif;
 box-shadow: 0 0 20px rgba(0,85,255,0.4);
 width: 85%;
-max-width: 280px;
+max-width: 260px;
 letter-spacing: 1px;
 }
 
@@ -204,59 +200,33 @@ animation: fadeInUp 0.6s ease;
 }
 
 @keyframes fadeIn {
-from { opacity: 0; transform: translateY(10px); }
+from { opacity: 0; transform: translateY(8px); }
 to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeInUp {
-from { opacity: 0; transform: translateY(30px); }
+from { opacity: 0; transform: translateY(20px); }
 to { opacity: 1; transform: translateY(0); }
 }
 
 ::-webkit-scrollbar {
-width: 4px;
+width: 3px;
 }
-
-::-webkit-scrollbar-track {
-background: transparent;
-}
-
 ::-webkit-scrollbar-thumb {
 background: #0055ff;
 border-radius: 10px;
 }
 
-/* Ajustes específicos para mobile */
 @media (max-width: 600px) {
 .message {
 max-width: 95%;
-font-size: 0.85rem;
-padding: 10px 14px;
+font-size: 0.8rem;
+padding: 8px 12px;
 }
-.logo {
-font-size: 1.1rem;
-}
-.sub {
-font-size: 0.6rem;
-}
-.input-area input {
-padding: 10px 14px;
-font-size: 0.85rem;
-}
-.input-area button {
-padding: 8px 16px;
-font-size: 0.85rem;
-}
-.cta-button {
-font-size: 1rem;
-padding: 14px 20px;
-width: 90%;
-}
-}
-
-.assistant-message-text {
-white-space: normal;
-word-break: break-word;
+.logo { font-size: 1rem; }
+.sub { font-size: 0.55rem; }
+.input-area input { padding: 8px 14px; font-size: 0.8rem; }
+.input-area button { padding: 6px 14px; font-size: 0.8rem; }
 }
 </style>
 </head>
@@ -283,7 +253,7 @@ word-break: break-word;
 </div>
 
 <script>
-// THREE.JS GALAXY BACKGROUND
+// THREE.JS GALAXY BACKGROUND (MESMO DO PRIMEIRO CÓDIGO)
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ alpha: true });
@@ -292,7 +262,7 @@ renderer.setClearColor(0x010308, 1);
 document.getElementById('galaxy-bg').appendChild(renderer.domElement);
 
 const geometry = new THREE.BufferGeometry();
-const particlesCount = 1500;
+const particlesCount = 1800;
 const positions = new Float32Array(particlesCount * 3);
 for (let i = 0; i < particlesCount; i++) {
 positions[i*3] = (Math.random() - 0.5) * 200;
@@ -300,10 +270,9 @@ positions[i*3+1] = (Math.random() - 0.5) * 100;
 positions[i*3+2] = (Math.random() - 0.5) * 100 - 50;
 }
 geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-const material = new THREE.PointsMaterial({ color: 0x88aaff, size: 0.12, transparent: true, opacity: 0.5 });
+const material = new THREE.PointsMaterial({ color: 0x88aaff, size: 0.15, transparent: true, opacity: 0.6 });
 const particles = new THREE.Points(geometry, material);
 scene.add(particles);
-
 camera.position.z = 30;
 
 function animate() {
@@ -320,31 +289,16 @@ camera.updateProjectionMatrix();
 renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// SCRIPT DE ALTA PERFORMANCE
+// --- CHAT HUMANO COM NOME E RESPOSTAS COMPREENSIVAS ---
 const chatContainer = document.getElementById('chat-container');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 const finalCtaDiv = document.getElementById('final-cta');
 const inputContainer = document.getElementById('input-container');
 
-let messageIndex = 0;
-let waitingForResponse = true;
-
-const highPerformanceMessages = [
-    "Você já sentiu que poderia estar vivendo mais… mas não sabe exatamente o que está faltando?",
-    "Já teve a sensação de que existe algo dentro de você… esperando para ser despertado?",
-    "Em algum momento, você já se perguntou se a vida que está vivendo hoje… é realmente a vida que você escolheu?",
-    "E se, sem perceber, você estiver apenas repetindo padrões… vivendo no automático… distante da sua real capacidade?",
-    "Você sente que está explorando tudo o que poderia… ou apenas fazendo o que precisa ser feito?",
-    "E se o problema não for falta de esforço… mas falta de clareza?",
-    "E se existir uma versão sua — mais forte, mais consciente, mais direcionada — que ainda não teve a chance de emergir?",
-    "Agora me diz…\nSe você continuar exatamente como está hoje… para onde isso te leva?",
-    "E daqui a alguns anos… você acha que vai se orgulhar… ou se questionar?",
-    "O que pesa mais para você:\narriscar mudar… ou permanecer igual?",
-    "Porque no fundo, você sabe…\nExiste algo aí dentro que ainda não foi acessado.\nAlgo que você sente… mas não consegue explicar.",
-    "E talvez o que esteja faltando… não seja motivação.\nTalvez seja um gatilho.\nUma virada.\nUm ponto de ruptura.",
-    "Agora deixa eu te fazer uma pergunta diferente:\n\nE se você encontrasse uma oportunidade de descobrir algo que pudesse mudar tudo?\nAlgo capaz de criar um caos dentro de você…\nmas um caos necessário — aquele que destrói o que te limita para dar origem a uma nova versão sua."
-];
+let step = 0;          // 0: aguardando nome, 1: fluxo principal
+let userName = "";
+let conversationStage = 0;  // controle das perguntas
 
 async function typeText(text, element) {
     const words = text.split(" ");
@@ -353,7 +307,7 @@ async function typeText(text, element) {
         currentText += word + " ";
         element.innerHTML = currentText.replace(/\n/g, '<br>');
         chatContainer.scrollTop = chatContainer.scrollHeight;
-        await new Promise(resolve => setTimeout(resolve, 20));
+        await new Promise(resolve => setTimeout(resolve, 18));
     }
 }
 
@@ -361,65 +315,113 @@ async function addMessage(text, role) {
     const msgDiv = document.createElement('div');
     msgDiv.classList.add('message', role);
     chatContainer.insertBefore(msgDiv, finalCtaDiv);
-    
     if (role === 'assistant') {
         await typeText(text, msgDiv);
     } else {
         msgDiv.innerText = text;
     }
-    
     chatContainer.scrollTop = chatContainer.scrollHeight;
+    return msgDiv;
 }
 
-async function sendNextMessage() {
-    if (messageIndex < highPerformanceMessages.length) {
-        await addMessage(highPerformanceMessages[messageIndex], 'assistant');
-        messageIndex++;
-        
-        if (messageIndex === highPerformanceMessages.length) {
-            setTimeout(() => {
-                inputContainer.style.opacity = '0';
-                setTimeout(() => {
-                    inputContainer.style.display = 'none';
-                    finalCtaDiv.style.display = 'block';
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-                }, 500);
-            }, 1000);
+// Função para extrair nome de forma natural
+function extrairNome(input) {
+    const patterns = [
+        /(?:me chamo|sou o|sou a|meu nome é|chamo-me)\s*([A-Za-zÀ-ÿ]+)/i,
+        /^([A-Za-zÀ-ÿ]{2,})/i
+    ];
+    for (let p of patterns) {
+        const match = input.match(p);
+        if (match && match[1]) {
+            let nome = match[1];
+            return nome.charAt(0).toUpperCase() + nome.slice(1).toLowerCase();
         }
+    }
+    return "";
+}
+
+// Respostas humanas baseadas no estágio da conversa
+async function continuarConversa(respostaUsuario) {
+    if (conversationStage === 0) {
+        // Após capturar o nome, faz a primeira pergunta curta
+        await addMessage(`Prazer, ${userName}! 🌟\n\nVocê já sentiu que poderia estar vivendo mais, mas não sabe exatamente o que está faltando?`, 'assistant');
+        conversationStage = 1;
+    } 
+    else if (conversationStage === 1) {
+        await addMessage(`Entendo, ${userName}. E essa sensação de que existe algo dentro de você esperando para ser despertado... já te acompanha há tempo?`, 'assistant');
+        conversationStage = 2;
+    }
+    else if (conversationStage === 2) {
+        await addMessage(`Pode parecer estranho, ${userName}, mas muitos de nós vivemos no automático, repetindo padrões. Você sente que está escolhendo sua vida ou apenas reagindo a ela?`, 'assistant');
+        conversationStage = 3;
+    }
+    else if (conversationStage === 3) {
+        await addMessage(`Faz sentido. Agora me diz, ${userName}: se você continuar exatamente como está hoje, para onde isso te leva daqui a alguns anos?`, 'assistant');
+        conversationStage = 4;
+    }
+    else if (conversationStage === 4) {
+        await addMessage(`Obrigado por compartilhar. O que pesa mais pra você, ${userName}: arriscar mudar ou permanecer igual?`, 'assistant');
+        conversationStage = 5;
+    }
+    else if (conversationStage === 5) {
+        await addMessage(`A verdade é que existe uma versão sua mais forte, mais consciente, que ainda não emergiu. E talvez falte só um gatilho... uma virada.`, 'assistant');
+        conversationStage = 6;
+    }
+    else if (conversationStage === 6) {
+        await addMessage(`E se, ${userName}, você encontrasse uma oportunidade de descobrir algo que pudesse mudar tudo? Um caos necessário para destruir o que te limita.`, 'assistant');
+        conversationStage = 7;
+    }
+    else if (conversationStage === 7) {
+        await addMessage(`Fico feliz que esteja aberto a isso, ${userName}. Para te ajudar nessa virada, preparei um material especial. Posso liberar seu acesso agora?`, 'assistant');
+        conversationStage = 8;
+    }
+    else if (conversationStage === 8) {
+        await addMessage(`Excelente, ${userName}! Então é pra frente que você quer ir.`, 'assistant');
+        setTimeout(() => {
+            inputContainer.style.opacity = '0';
+            setTimeout(() => {
+                inputContainer.style.display = 'none';
+                finalCtaDiv.style.display = 'block';
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 500);
+        }, 1500);
     }
 }
 
-async function handleUserResponse() {
+async function handleSend() {
     const text = userInput.value.trim();
-    if (!text || !waitingForResponse) return;
-    
+    if (!text) return;
     userInput.value = "";
     await addMessage(text, 'user');
-    waitingForResponse = false;
-    
-    setTimeout(() => {
-        sendNextMessage();
-        waitingForResponse = true;
-    }, 500);
+
+    if (step === 0) {
+        const nome = extrairNome(text);
+        if (nome) {
+            userName = nome;
+            step = 1;
+            await continuarConversa("");
+        } else {
+            await addMessage("Percebi que não me disse seu nome ainda. Como posso te chamar?", 'assistant');
+        }
+    } else {
+        await continuarConversa(text);
+    }
 }
 
-sendBtn.addEventListener('click', handleUserResponse);
-userInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') handleUserResponse();
-});
+sendBtn.addEventListener('click', handleSend);
+userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
 window.onload = async () => {
-    await new Promise(r => setTimeout(r, 500));
-    sendNextMessage();
+    await new Promise(r => setTimeout(r, 600));
+    await addMessage("👋 Olá! Eu sou o assistente da Lumo Advisory. Antes de começarmos, me conta: qual é o seu nome?", 'assistant');
 };
 
-// Força o scroll quando o teclado abre (mobile)
+// Ajuste de scroll no mobile
 window.addEventListener('resize', () => {
     setTimeout(() => {
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }, 100);
 });
 </script>
-
 </body>
 </html>
