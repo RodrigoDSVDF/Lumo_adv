@@ -381,7 +381,7 @@
             await addMsg(`E se existir uma versão sua — mais forte, mais consciente, mais direcionada — que ainda não teve a chance de emergir? Você gostaria de despertar para esse novo eu?`, 'ai');
             step = 4;
         } else if(step === 4) {
-            await addMsg(`${userName}, talvez o que esteja faltando… não seja motivação.<br>Talvez seja um gatilho.<br>Uma virada.<br>Um ponto de ruptura.`, 'ai');
+            await addMsg(`É isso,${userName}, talvez o que esteja faltando… não seja motivação.<br>Talvez seja um gatilho.<br>Uma virada.<br>Um ponto de ruptura.`, 'ai');
             await new Promise(r => setTimeout(r, 1000));
             await addMsg(`E se você descobrisse algo capaz de criar um caos dentro de você… mas um caos necessário — aquele que destrói o que te limita para dar origem a uma nova versão sua.`, 'ai');
             await new Promise(r => setTimeout(r, 500));
@@ -407,7 +407,7 @@
 
     window.onload = async () => {
         await new Promise(r => setTimeout(r, 1000));
-        await addMsg("Seja bem-vindo ao despertar.<br>Para começarmos a sintonizar sua nova realidade, como você se chama?", "ai");
+        await addMsg("Seja bem-vindo ao atendimento personalizado, vamos começar.<br>Para começarmos a sintonizar sua nova realidade, como você se chama?", "ai");
     };
 </script>
 
