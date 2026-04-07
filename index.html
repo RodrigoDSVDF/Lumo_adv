@@ -366,7 +366,7 @@
 
     async function runNarrative() {
         if(step === 1) {
-            await addMsg(`Prazer em te conhecer, ${userName}.<br><br>Você já sentiu que poderia estar vivendo mais… mas não sabe exatamente o que está faltando?`, 'ai');
+            await addMsg(`Prazer em te conhecer, ${userName}.<br><br>Agora me diga, já sentiu que poderia estar vivendo mais… mas não sabe exatamente o que está faltando?`, 'ai');
             await new Promise(r => setTimeout(r, 1000));
             await addMsg(`Já teve a sensação de que existe algo dentro de você… esperando para ser despertado?`, 'ai');
             step = 2;
