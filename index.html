@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Frequência Mental Poderosa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --primary: #0066ff;
+            --accent: #e0e0e0;
+            --bg-dark: #010409;
+            --glass: rgba(10, 20, 40, 0.9);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            background-color: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            color: #ffffff;
+            overflow: hidden; 
+            position: fixed;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .app-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+        }
+
+        header {
+            padding: 20px 16px;
+            text-align: center;
+            background: linear-gradient(to bottom, rgba(1, 4, 9, 0.95), transparent);
+            flex-shrink: 0;
+        }
+
+        .title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            background: linear-gradient(180deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-transform: uppercase;
+        }
+
+        #chat-flow {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            -webkit-overflow-scrolling: touch;
+            mask-image: linear-gradient(to bottom, transparent, black 8%, black 92%, transparent);
+        }
+
+        .bubble {
+            max-width: 88%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            position: relative;
+            animation: slideUp 0.5s ease forwards;
+            word-wrap: break-word;
+        }
+
+        .bubble.ai {
+            align-self: flex-start;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            border-bottom-left-radius: 4px;
+            color: #f0f4f8;
+        }
+
+        .bubble.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #0044cc 0%, #0066ff 100%);
+            color: #ffffff;
+            font-weight: 500;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0, 102, 255, 0.2);
+        }
+
+        .typing::after {
+            content: '';
+            width: 2px;
+            height: 14px;
+            background: #0066ff;
+            display: inline-block;
+            margin-left: 5px;
+            vertical-align: middle;
+            animation: blink 0.8s infinite;
+        }
+
+        .interaction-zone {
+            padding: 12px 16px;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            background: rgba(1, 4, 9, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 20;
+        }
+
+        .input-pill {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 28px;
+            padding: 12px 20px;
+            color: #fff;
+            font-size: 16px; 
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .input-pill:focus {
+            border-color: #0066ff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .send-trigger {
+            background: #0066ff;
+            color: #ffffff;
+            border: none;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
+        }
+
+        #cta-wrapper {
+            display: none;
+            text-align: center;
+            padding: 30px 0;
+            width: 100%;
+        }
+
+        .final-button {
+            display: inline-block;
+            background: #ffffff;
+            color: #010409;
+            padding: 18px 36px;
+            border-radius: 40px;
+            font-weight: 900;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes blink { 50% { opacity: 0; } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<div class="app-wrapper">
+    <header>
+        <div class="title">Frequência Mental Poderosa</div>
+    </header>
+
+    <div id="chat-flow">
+        <div id="cta-wrapper">
+            <a href="https://frequencia.nexus-manual.com.br" class="final-button">INICIAR JORNADA</a>
+        </div>
+    </div>
+
+    <form class="interaction-zone" id="input-form" action="javascript:void(0);">
+        <input type="text" id="user-input" class="input-pill" placeholder="Sua resposta..." autocomplete="off" spellcheck="false">
+        <button type="submit" class="send-trigger" id="send-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+    </form>
+</div>
+
+<script>
+    const params = {
+        count: 35000,
+        size: 0.008,
+        radius: 5,
+        branches: 3,
+        spin: 1.2,
+        randomness: 0.4,
+        randomnessPower: 3,
+        insideColor: '#0066ff',
+        outsideColor: '#e0e0e0'
+    };
+
+    let scene, camera, renderer, points, geometry, material;
+
+    const initGalaxy = () => {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = 4.5;
+        camera.position.y = 1.0;
+        camera.rotation.x = -0.25;
+
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(params.count * 3);
+        const colors = new Float32Array(params.count * 3);
+
+        const colorInside = new THREE.Color(params.insideColor);
+        const colorOutside = new THREE.Color(params.outsideColor);
+
+        for (let i = 0; i < params.count; i++) {
+            const i3 = i * 3;
+            const radius = Math.random() * params.radius;
+            const spinAngle = radius * params.spin;
+            const branchAngle = ((i % params.branches) / params.branches) * Math.PI * 2;
+
+            const randomX = Math.pow(Math.random(), params.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * params.randomness * radius;
+            const randomY = Math.pow(Math.random(), params.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * params.randomness * radius;
+            const randomZ = Math.pow(Math.random(), params.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * params.randomness * radius;
+
+            positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
+            positions[i3 + 1] = randomY;
+            positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+
+            const mixedColor = colorInside.clone();
+            mixedColor.lerp(colorOutside, radius / params.radius);
+            colors[i3] = mixedColor.r;
+            colors[i3 + 1] = mixedColor.g;
+            colors[i3 + 2] = mixedColor.b;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        material = new THREE.PointsMaterial({
+            size: params.size,
+            sizeAttenuation: true,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            vertexColors: true
+        });
+
+        points = new THREE.Points(geometry, material);
+        scene.add(points);
+    };
+
+    const clock = new THREE.Clock();
+    const animate = () => {
+        const elapsedTime = clock.getElapsedTime();
+        if(points) points.rotation.y = elapsedTime * 0.05;
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+    };
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    initGalaxy();
+    animate();
+
+    /**
+     * Extrai o primeiro nome real da resposta do usuário.
+     * Lida com padrões como:
+     *   "João"
+     *   "meu nome é João"
+     *   "me chamo João"
+     *   "sou o João" / "sou a Maria"
+     *   "pode me chamar de João"
+     *   "é João" / "é o João"
+     */
+    function extractName(text) {
+        const input = text.trim();
+
+        // Padrões que introduzem o nome — captura a palavra logo após
+        const patterns = [
+            /(?:meu nome\s+[eé]\s+)([a-záéíóúàâêôãõüçñ]+)/i,
+            /(?:me\s+chamo\s+)([a-záéíóúàâêôãõüçñ]+)/i,
+            /(?:pode(?:m)?\s+me\s+chamar\s+de\s+)([a-záéíóúàâêôãõüçñ]+)/i,
+            /(?:sou\s+(?:o\s+|a\s+)?)([a-záéíóúàâêôãõüçñ]+)/i,
+            /(?:^|\s)(?:é\s+(?:o\s+|a\s+)?)([a-záéíóúàâêôãõüçñ]+)/i,
+            /(?:chamo\s+)([a-záéíóúàâêôãõüçñ]+)/i,
+            /(?:nome\s+)([a-záéíóúàâêôãõüçñ]+)/i,
+        ];
+
+        for (const pattern of patterns) {
+            const match = input.match(pattern);
+            if (match && match[1]) {
+                // Capitaliza a primeira letra
+                return match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase();
+            }
+        }
+
+        // Fallback: se nenhum padrão bater, usa a última palavra
+        // (cobre "João" puro ou "sou eu, João")
+        const words = input.split(/\s+/);
+        const last = words[words.length - 1].replace(/[^a-záéíóúàâêôãõüçñ]/gi, '');
+        return last.charAt(0).toUpperCase() + last.slice(1).toLowerCase();
+    }
+
+    const chatFlow = document.getElementById('chat-flow');
+    const userInput = document.getElementById('user-input');
+    const inputForm = document.getElementById('input-form');
+    const ctaWrapper = document.getElementById('cta-wrapper');
+    const inputContainer = document.getElementById('input-form');
+
+    let step = 0;
+    let userName = "";
+
+    async function addMsg(content, sender) {
+        const bubble = document.createElement('div');
+        bubble.className = `bubble ${sender}`;
+        chatFlow.insertBefore(bubble, ctaWrapper);
+        
+        if(sender === 'ai') {
+            bubble.classList.add('typing');
+            const parts = content.split('<br>');
+            for(let p = 0; p < parts.length; p++) {
+                let text = parts[p];
+                for(let j=0; j < text.length; j++) {
+                    bubble.innerHTML += text.charAt(j);
+                    chatFlow.scrollTop = chatFlow.scrollHeight;
+                    await new Promise(r => setTimeout(r, 15));
+                }
+                if(p < parts.length - 1) bubble.innerHTML += '<br>';
+            }
+            bubble.classList.remove('typing');
+        } else {
+            bubble.textContent = content;
+            chatFlow.scrollTop = chatFlow.scrollHeight;
+        }
+    }
+
+    async function handleInteraction() {
+        const text = userInput.value.trim();
+        if(!text) return;
+        
+        userInput.value = "";
+        await addMsg(text, 'user');
+
+        if(step === 0) {
+            userName = extractName(text); // ← usa a função inteligente
+            step = 1;
+        }
+        await runNarrative();
+    }
+
+    async function runNarrative() {
+        if(step === 1) {
+            await addMsg(`Prazer em te conhecer, ${userName}.<br><br>Agora me diga, já sentiu que poderia estar vivendo mais… mas não sabe exatamente o que está faltando?`, 'ai');
+            await new Promise(r => setTimeout(r, 1000));
+            await addMsg(`Já teve a sensação de que existe algo dentro de você… esperando para ser despertado?`, 'ai');
+            step = 2;
+        } else if(step === 2) {
+            await addMsg(`Em algum momento, você já se perguntou se a vida que está vivendo hoje… é realmente a vida que você escolheu?<br><br>E se, sem perceber, você estiver apenas repetindo padrões… vivendo no automático… distante da sua real capacidade?`, 'ai');
+            await new Promise(r => setTimeout(r, 800));
+            await addMsg(`Você sente que está explorando tudo o que poderia… ou apenas fazendo o que precisa ser feito?`, 'ai');
+            step = 3;
+        } else if(step === 3) {
+            await addMsg(`Muito bem, ${userName}, te entendo perfeitamente! E se o problema não for falta de esforço… mas falta de clareza?`, 'ai');
+            await new Promise(r => setTimeout(r, 800));
+            await addMsg(`E se existir uma versão sua — mais forte, mais consciente, mais direcionada — que ainda não teve a chance de emergir? Você gostaria de despertar para esse novo eu?`, 'ai');
+            step = 4;
+        } else if(step === 4) {
+            await addMsg(`É isso, ${userName}, talvez o que esteja faltando… não seja motivação.<br>Talvez seja um gatilho.<br>Uma virada.<br>Um ponto de ruptura.`, 'ai');
+            await new Promise(r => setTimeout(r, 1000));
+            await addMsg(`E se você descobrisse algo capaz de criar um caos dentro de você… mas um caos necessário — aquele que destrói o que te limita para dar origem a uma nova versão sua.`, 'ai');
+            await new Promise(r => setTimeout(r, 500));
+            await addMsg(`Gostaria de saber mais?`, 'ai');
+            step = 5;
+        } else if(step === 5) {
+            await addMsg(`Perfeito. Quem valoriza o despertar valoriza, acima de tudo, o tempo. Afinal, a consciência da nossa finitude é o que nos dá coragem para mudar agora, antes que o relógio decida por nós`, 'ai');
+            await new Promise(r => setTimeout(r, 1000));
+            await addMsg(`Então liberei agora sua nova jornada de transformação!`, 'ai');
+            
+            inputContainer.style.display = 'none';
+            ctaWrapper.style.display = 'block';
+            chatFlow.scrollTop = chatFlow.scrollHeight;
+        }
+    }
+
+    inputForm.onsubmit = (e) => {
+        e.preventDefault();
+        handleInteraction();
+        return false;
+    };
+
+    window.onload = async () => {
+        await new Promise(r => setTimeout(r, 1000));
+        await addMsg("Antes de qualquer saudação comum, eu preciso que você respire por um instante.<br>O que começa agora não é um bate-papo. É o primeiro movimento de algo que você não vive todos os dias.<br>Eu vou te guiar. Mas primeiro: como você se chama?", "ai");
+    };
+</script>
+
+</body>
+</html>
