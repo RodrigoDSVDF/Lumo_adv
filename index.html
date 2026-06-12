@@ -192,6 +192,7 @@
             flex-shrink: 0;
         }
 
+        /* Área de input corrigida */
         #input-container {
             padding: 10px 12px 22px;
             flex-shrink: 0;
@@ -201,10 +202,12 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             z-index: 5;
+            width: 100%;
+            flex-wrap: nowrap; /* Mantém em linha, mas se necessário podemos permitir wrap */
         }
 
         #name-input {
-            flex: 1;
+            flex: 1 1 auto;
             min-width: 0;
             background: rgba(20,30,50,0.7);
             backdrop-filter: blur(14px);
@@ -233,7 +236,7 @@
             background: var(--primary);
             border: none;
             border-radius: 30px;
-            padding: 0 20px;
+            padding: 0 18px;
             color: #fff;
             font-weight: 700;
             font-size: 0.85rem;
@@ -251,15 +254,50 @@
             background: #2060cc;
         }
 
-        @media (max-width: 360px) {
+        /* Ajustes progressivos para telas menores */
+        @media (max-width: 400px) {
+            #input-container {
+                padding: 10px 10px 22px;
+                gap: 6px;
+            }
             .send-btn {
-                padding: 0 14px;
+                padding: 0 16px;
                 font-size: 0.8rem;
+            }
+            #name-input {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            #input-container {
+                padding: 10px 8px 22px;
+                gap: 5px;
+            }
+            .send-btn {
+                padding: 0 12px;
+                font-size: 0.75rem;
                 letter-spacing: 0;
             }
             #name-input {
-                padding: 13px 14px;
-                font-size: 0.9rem;
+                padding: 12px 12px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 320px) {
+            #input-container {
+                padding: 10px 6px 22px;
+                gap: 4px;
+            }
+            .send-btn {
+                padding: 0 10px;
+                font-size: 0.7rem;
+            }
+            #name-input {
+                padding: 10px 10px;
+                font-size: 0.8rem;
             }
         }
 
@@ -386,15 +424,14 @@
     let awaitingOption = false;
     let optionResolver = null;
 
-    // 7 dimensões do perfil
     const profile = {
-        perfil: null,        // Q1
-        ia: null,            // Q2
-        habilidade: null,    // Q3
-        informacao: null,    // Q4
-        obstaculo: null,     // Q5
-        aprendizado: null,   // Q6 (nova)
-        forca: null          // Q7 (nova)
+        perfil: null,
+        ia: null,
+        habilidade: null,
+        informacao: null,
+        obstaculo: null,
+        aprendizado: null,
+        forca: null
     };
 
     function scrollToBottom() {
@@ -450,15 +487,12 @@
         });
     }
 
-    // --- SISTEMA DE DIAGNÓSTICO DIVERSIFICADO ---
     function gerarDiagnostico(p) {
-        // Determinamos um perfil principal baseado nas respostas
         let tipo = '';
         let pontosFortes = [];
         let pontosAtencao = [];
         let recomendacao = '';
 
-        // Lógica de classificação
         if (p.perfil === 0 && p.obstaculo === 0) {
             tipo = 'Criativo Bloqueado';
             pontosFortes.push('Grande capacidade de ideação e criatividade');
@@ -523,7 +557,6 @@
             pontosAtencao.push('Risco de perfeccionismo paralisante');
             recomendacao = 'Use sua habilidade organizacional para criar um sistema pessoal, mas lembre-se: a ação imperfeita supera o planejamento perfeito.';
         } else {
-            // Perfil genérico mas ainda personalizado com base nas respostas
             tipo = 'Em Transição';
             pontosFortes.push('Autoconhecimento em desenvolvimento');
             pontosFortes.push('Disposição para identificar áreas de melhoria');
@@ -532,7 +565,6 @@
             recomendacao = 'Seu perfil indica que você está no momento certo para adotar um sistema integrado. O Nexus Manual foi desenhado para pessoas exatamente como você.';
         }
 
-        // Adiciona pontos extras com base em respostas específicas
         if (p.ia >= 2) pontosFortes.push('Familiaridade com IA como vantagem competitiva');
         if (p.habilidade === 3) pontosFortes.push('Busca por clareza decisória – sinal de maturidade');
         if (p.obstaculo === 1) pontosAtencao.push('Gestão do tempo é uma oportunidade de melhoria imediata');
@@ -541,7 +573,7 @@
 
         return {
             tipo,
-            pontosFortes: [...new Set(pontosFortes)], // remove duplicatas
+            pontosFortes: [...new Set(pontosFortes)],
             pontosAtencao: [...new Set(pontosAtencao)],
             recomendacao
         };
@@ -604,7 +636,6 @@
             await addMsg(choice.text, 'user');
             step = 6; runNarrative();
         } else if (step === 6) {
-            // NOVA PERGUNTA 6
             await addMsg(`Como você aprende melhor?`, 'ai');
             const choice = await waitForOption([
                 'Lendo e fazendo anotações',
@@ -616,7 +647,6 @@
             await addMsg(choice.text, 'user');
             step = 7; runNarrative();
         } else if (step === 7) {
-            // NOVA PERGUNTA 7
             await addMsg(`Qual você considera sua maior força?`, 'ai');
             const choice = await waitForOption([
                 'Resiliência e determinação',
@@ -630,9 +660,7 @@
         } else if (step === 8) {
             await addMsg(`Processando seu diagnóstico personalizado...`, 'ai');
             await new Promise(r => setTimeout(r, 1800));
-
             const diag = gerarDiagnostico(profile);
-
             await addMsg(
                 `${userName}, seu perfil é <strong>${diag.tipo}</strong>.<br><br>` +
                 `<strong>✅ Pontos fortes:</strong><br>• ${diag.pontosFortes.join('<br>• ')}<br><br>` +
@@ -640,13 +668,11 @@
                 'ai'
             );
             await new Promise(r => setTimeout(r, 2500));
-
             await addMsg(
                 `<strong>Recomendação:</strong><br>${diag.recomendacao}`,
                 'ai'
             );
             await new Promise(r => setTimeout(r, 2000));
-
             await addMsg(
                 `O Nexus Manual foi projetado para atuar exatamente nesses pontos, integrando IA, organização e execução em um único sistema.`,
                 'ai'
