@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Frequência Mental Poderosa</title>
+    <title>Você está preparado para a era da IA?</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+    </script>
     <style>
         :root {
             --primary: #4f8fff;
-            --accent: #c0e0ff;
             --bg-dark: #010409;
             --glass: rgba(8, 18, 36, 0.85);
-            --glass-border: rgba(79, 143, 255, 0.25);
-            --user-bubble: rgba(0, 102, 255, 0.15);
+            --glass-border: rgba(79, 143, 255, 0.2);
+            --user-bubble: rgba(0, 102, 255, 0.2);
             --user-border: rgba(0, 102, 255, 0.5);
             --text: #ffffff;
             --text-soft: #d0d8e8;
@@ -37,8 +37,6 @@
             color: var(--text);
             overflow: hidden;
             position: fixed;
-            top: 0;
-            left: 0;
         }
 
         #canvas-container {
@@ -59,15 +57,15 @@
             width: 100%;
             height: 100vh;
             height: 100dvh;
-            max-width: 520px;
+            max-width: 500px;
             margin: 0 auto;
         }
 
         header {
-            padding: 22px 16px 12px;
+            padding: 22px 16px 10px;
             text-align: center;
             flex-shrink: 0;
-            background: linear-gradient(to bottom, rgba(1, 4, 9, 0.97) 30%, transparent);
+            background: linear-gradient(to bottom, rgba(1, 4, 9, 0.95), transparent);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             position: relative;
@@ -75,15 +73,14 @@
         }
 
         .title {
-            font-size: 1.25rem;
+            font-size: 1rem;
             font-weight: 900;
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             background: linear-gradient(135deg, #ffffff 0%, #8ab4f8 80%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             text-transform: uppercase;
-            text-shadow: 0 0 20px rgba(79, 143, 255, 0.3);
         }
 
         #chat-flow {
@@ -92,7 +89,7 @@
             padding: 12px 16px 20px;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 16px;
             -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
             mask-image: linear-gradient(to bottom, transparent 0%, black 6%, black 90%, transparent 100%);
@@ -103,16 +100,16 @@
 
         .bubble {
             max-width: 85%;
-            padding: 14px 18px;
-            border-radius: 22px;
-            font-size: 0.95rem;
-            line-height: 1.6;
+            padding: 13px 17px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            line-height: 1.55;
             font-weight: 400;
             position: relative;
-            animation: slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             word-wrap: break-word;
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(16px);
             will-change: transform, opacity;
         }
 
@@ -131,7 +128,7 @@
             border: 1px solid var(--glass-border);
             color: var(--text-soft);
             border-bottom-left-radius: 8px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(79, 143, 255, 0.3) inset;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         }
 
         .bubble.user {
@@ -143,21 +140,21 @@
             color: #ffffff;
             border-bottom-right-radius: 8px;
             text-align: right;
-            box-shadow: 0 8px 24px rgba(0, 102, 255, 0.15), 0 0 0 0.5px rgba(0, 162, 255, 0.4) inset;
+            box-shadow: 0 8px 24px rgba(0, 102, 255, 0.2);
         }
 
         .options-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 4px;
-            animation: fadeIn 0.3s ease 0.2s both;
+            gap: 8px;
+            margin-top: 6px;
+            animation: fadeIn 0.3s ease 0.15s both;
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(8px);
+                transform: translateY(6px);
             }
             to {
                 opacity: 1;
@@ -166,38 +163,37 @@
         }
 
         .option-btn {
-            background: rgba(20, 30, 50, 0.7);
+            background: rgba(20, 30, 50, 0.65);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
-            padding: 14px 16px;
+            padding: 13px 16px;
             color: #ffffff;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 500;
             text-align: left;
             cursor: pointer;
-            transition: all 0.25s ease;
-            letter-spacing: 0.2px;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         .option-btn:active {
             transform: scale(0.97);
             background: rgba(79, 143, 255, 0.2);
-            border-color: rgba(79, 143, 255, 0.5);
-            box-shadow: 0 0 20px rgba(0, 102, 255, 0.3);
+            border-color: rgba(79, 143, 255, 0.45);
+            box-shadow: 0 0 18px rgba(0, 102, 255, 0.25);
         }
 
         .option-number {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             background: var(--primary);
             color: #fff;
             border-radius: 50%;
@@ -207,14 +203,13 @@
         }
 
         #input-container {
-            padding: 12px 16px 24px;
+            padding: 10px 16px 22px;
             flex-shrink: 0;
             display: flex;
             gap: 10px;
             background: linear-gradient(to top, rgba(1, 4, 9, 0.95), transparent);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            position: relative;
             z-index: 5;
         }
 
@@ -225,13 +220,12 @@
             -webkit-backdrop-filter: blur(14px);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 30px;
-            padding: 14px 20px;
+            padding: 13px 18px;
             color: #fff;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-family: 'Inter', sans-serif;
             outline: none;
             transition: all 0.3s ease;
-            letter-spacing: 0.3px;
         }
 
         #name-input:focus {
@@ -241,20 +235,20 @@
         }
 
         #name-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.35);
         }
 
         .send-btn {
             background: var(--primary);
             border: none;
             border-radius: 30px;
-            padding: 0 24px;
+            padding: 0 22px;
             color: #fff;
             font-weight: 700;
             font-size: 0.9rem;
             letter-spacing: 0.5px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             box-shadow: 0 4px 15px rgba(0, 102, 255, 0.4);
             text-transform: uppercase;
             white-space: nowrap;
@@ -263,45 +257,43 @@
         .send-btn:active {
             transform: scale(0.95);
             background: #2060cc;
-            box-shadow: 0 2px 8px rgba(0, 102, 255, 0.6);
         }
 
         #cta-wrapper {
-            padding: 16px 16px 28px;
+            padding: 12px 16px 26px;
             flex-shrink: 0;
             display: none;
             background: linear-gradient(to top, rgba(1, 4, 9, 0.95), transparent);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             z-index: 5;
-            position: relative;
         }
 
         .final-button {
             width: 100%;
             background: linear-gradient(135deg, #0066ff, #4f8fff);
             border: none;
-            border-radius: 34px;
-            padding: 18px 24px;
+            border-radius: 32px;
+            padding: 17px 20px;
             color: #fff;
             font-weight: 900;
             font-size: 1rem;
-            letter-spacing: 1.2px;
+            letter-spacing: 1px;
             cursor: pointer;
-            box-shadow: 0 8px 30px rgba(0, 102, 255, 0.5);
+            box-shadow: 0 8px 28px rgba(0, 102, 255, 0.5);
             transition: all 0.3s ease;
             text-transform: uppercase;
             text-align: center;
-            animation: pulse-glow 2s infinite;
+            animation: pulse-glow 2.5s infinite;
         }
 
         @keyframes pulse-glow {
             0%,
             100% {
-                box-shadow: 0 8px 30px rgba(0, 102, 255, 0.5);
+                box-shadow: 0 8px 28px rgba(0, 102, 255, 0.5);
             }
             50% {
-                box-shadow: 0 8px 45px rgba(0, 150, 255, 0.8);
+                box-shadow: 0 8px 42px rgba(0, 150, 255, 0.8);
             }
         }
 
@@ -310,7 +302,6 @@
             box-shadow: 0 4px 20px rgba(0, 102, 255, 0.8);
         }
 
-        /* Scrollbar estilizada */
         #chat-flow::-webkit-scrollbar {
             width: 4px;
         }
@@ -327,7 +318,7 @@
     <div id="canvas-container"></div>
     <div class="app-wrapper">
         <header>
-            <div class="title">Frequência Mental Poderosa</div>
+            <div class="title">VOCÊ ESTÁ PREPARADO PARA A ERA DA IA?</div>
         </header>
         <div id="chat-flow"></div>
         <div id="input-container">
@@ -341,11 +332,11 @@
 
     <script>
         (function() {
-            // --- THREE.JS BACKGROUND ---
+            // --- THREE.JS BACKGROUND (leve) ---
             const canvasContainer = document.getElementById('canvas-container');
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 30;
+            camera.position.z = 28;
 
             const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -353,76 +344,43 @@
             renderer.setClearColor(0x000000, 0);
             canvasContainer.appendChild(renderer.domElement);
 
-            // Partículas
             const particlesGeometry = new THREE.BufferGeometry();
-            const particlesCount = 600;
+            const particlesCount = 450;
             const posArray = new Float32Array(particlesCount * 3);
             const speedArray = new Float32Array(particlesCount);
 
             for (let i = 0; i < particlesCount * 3; i += 3) {
-                posArray[i] = (Math.random() - 0.5) * 80;
-                posArray[i + 1] = (Math.random() - 0.5) * 50;
-                posArray[i + 2] = (Math.random() - 0.5) * 40;
-                speedArray[i / 3] = 0.002 + Math.random() * 0.008;
+                posArray[i] = (Math.random() - 0.5) * 70;
+                posArray[i + 1] = (Math.random() - 0.5) * 45;
+                posArray[i + 2] = (Math.random() - 0.5) * 35;
+                speedArray[i / 3] = 0.003 + Math.random() * 0.007;
             }
             particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
 
             const particlesMaterial = new THREE.PointsMaterial({
-                size: 0.12,
+                size: 0.1,
                 color: 0x4f8fff,
                 blending: THREE.AdditiveBlending,
                 depthWrite: false,
                 transparent: true,
-                opacity: 0.7,
+                opacity: 0.6,
             });
 
             const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
             scene.add(particlesMesh);
 
-            // Linhas conectando partículas próximas (opcional, efeito neural)
-            const linesMaterial = new THREE.LineBasicMaterial({
-                color: 0x1a3a6a,
-                transparent: true,
-                opacity: 0.15,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false,
-            });
-            const linesGeometry = new THREE.BufferGeometry();
-            const linesPositions = [];
-            const maxLines = 200;
-            for (let i = 0; i < maxLines; i++) {
-                const idx1 = Math.floor(Math.random() * particlesCount);
-                const idx2 = Math.floor(Math.random() * particlesCount);
-                const x1 = posArray[idx1 * 3];
-                const y1 = posArray[idx1 * 3 + 1];
-                const z1 = posArray[idx1 * 3 + 2];
-                const x2 = posArray[idx2 * 3];
-                const y2 = posArray[idx2 * 3 + 1];
-                const z2 = posArray[idx2 * 3 + 2];
-                linesPositions.push(x1, y1, z1);
-                linesPositions.push(x2, y2, z2);
-            }
-            linesGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(linesPositions), 3));
-            const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
-            scene.add(linesMesh);
-
             function animateBackground() {
                 requestAnimationFrame(animateBackground);
-
                 const positions = particlesGeometry.attributes.position.array;
                 for (let i = 0; i < positions.length; i += 3) {
                     positions[i + 1] += speedArray[i / 3] * 0.5;
-                    if (positions[i + 1] > 25) positions[i + 1] = -25;
-                    if (positions[i + 1] < -25) positions[i + 1] = 25;
+                    if (positions[i + 1] > 22) positions[i + 1] = -22;
+                    if (positions[i + 1] < -22) positions[i + 1] = 22;
                 }
                 particlesGeometry.attributes.position.needsUpdate = true;
-
-                particlesMesh.rotation.y += 0.0001;
-                linesMesh.rotation.y += 0.0001;
-
+                particlesMesh.rotation.y += 0.00015;
                 renderer.render(scene, camera);
             }
-
             animateBackground();
 
             window.addEventListener('resize', () => {
@@ -458,9 +416,9 @@
                     chatFlow.appendChild(bubble);
                     scrollToBottom();
 
-                    // Resolve após a animação de entrada + pequeno delay
-                    const duration = 450 + text.length * 2;
-                    setTimeout(resolve, Math.min(duration, 1200));
+                    const charCount = text.replace(/<[^>]*>/g, '').length;
+                    const readingTime = Math.min(Math.max(charCount * 70, 1600), 3800);
+                    setTimeout(resolve, readingTime);
                 });
             }
 
@@ -473,14 +431,13 @@
                 removeOptions();
                 const container = document.createElement('div');
                 container.className = 'options-container';
-
                 options.forEach((opt, index) => {
                     const btn = document.createElement('button');
                     btn.className = 'option-btn';
                     btn.innerHTML = `<span class="option-number">${index + 1}</span> ${opt}`;
                     btn.addEventListener('click', () => {
                         if (!awaitingOption) return;
-                        const selectedText = `${index + 1}️⃣ ${opt}`;
+                        const selectedText = `${opt}`;
                         removeOptions();
                         awaitingOption = false;
                         if (optionResolver) {
@@ -490,7 +447,6 @@
                     });
                     container.appendChild(btn);
                 });
-
                 chatFlow.appendChild(container);
                 scrollToBottom();
             }
@@ -506,100 +462,104 @@
             async function runNarrative() {
                 if (step === 1) {
                     await addMsg(
-                        `Prazer em conhecê-lo, ${userName}.<br><br> Vou fazer algumas perguntas rápidas para entender seu perfil.`,
+                        `Prazer em conhecê-lo, ${userName}.<br><br>Vou fazer algumas perguntas rápidas para entender seu perfil.`,
                         'ai'
                     );
 
                     const choice = await waitForOption([
-                        'Tenho muitas ideias, mas dificuldade para executá-las.',
-                        'Estudo bastante, mas esqueço parte do que aprendo.',
-                        'Sinto que perco muito tempo com tarefas repetitivas.',
-                        'Tenho dificuldade para manter foco e disciplina.',
+                        'Muitas ideias, mas dificuldade para executar',
+                        'Estudo bastante, mas esqueço o que aprendo',
+                        'Perco muito tempo com tarefas repetitivas',
+                        'Dificuldade para manter foco e disciplina',
                     ]);
 
                     await addMsg(choice.text, 'user');
                     step = 2;
-                    await runNarrative();
+                    runNarrative();
                 } else if (step === 2) {
                     await addMsg(
-                        `Interessante.<br><br> Agora me diga:<br><br> Você utiliza Inteligência Artificial atualmente?`,
+                        `Entendi.<br><br>Você utiliza Inteligência Artificial atualmente?`,
                         'ai'
                     );
 
                     const choice = await waitForOption([
-                        'Nunca utilizei.',
-                        'Utilizo ocasionalmente.',
-                        'Utilizo frequentemente.',
-                        'Utilizo todos os dias.',
+                        'Nunca utilizei',
+                        'Utilizo ocasionalmente',
+                        'Utilizo frequentemente',
+                        'Utilizo todos os dias',
                     ]);
 
                     await addMsg(choice.text, 'user');
                     step = 3;
-                    await runNarrative();
+                    runNarrative();
                 } else if (step === 3) {
                     await addMsg(
-                        `Mais uma pergunta.<br><br> Se pudesse melhorar apenas UMA habilidade nos próximos meses, qual escolheria?`,
+                        `Se pudesse melhorar apenas UMA habilidade, qual seria?`,
                         'ai'
                     );
 
                     const choice = await waitForOption([
-                        'Aprender mais rápido.',
-                        'Ser mais produtivo.',
-                        'Organizar melhor minha rotina.',
-                        'Tomar decisões melhores.',
+                        'Aprender mais rápido',
+                        'Ser mais produtivo',
+                        'Organizar melhor minha rotina',
+                        'Tomar decisões melhores',
                     ]);
 
                     await addMsg(choice.text, 'user');
                     step = 4;
-                    await runNarrative();
+                    runNarrative();
                 } else if (step === 4) {
-                    await addMsg(`Análise concluída...`, 'ai');
-                    await new Promise(r => setTimeout(r, 1500));
+                    await addMsg(`Analisando suas respostas...`, 'ai');
+                    await new Promise(r => setTimeout(r, 1400));
 
                     await addMsg(
-                        `Com base nas suas respostas, ${userName}, o problema não parece ser falta de capacidade.`,
+                        `${userName}, o problema não parece ser falta de capacidade.`,
                         'ai'
                     );
-                    await new Promise(r => setTimeout(r, 1200));
-
-                    await addMsg(`Também não parece ser falta de informação.`, 'ai');
-                    await new Promise(r => setTimeout(r, 1200));
+                    await new Promise(r => setTimeout(r, 1000));
 
                     await addMsg(
-                        `O padrão mais comum em pessoas com respostas semelhantes é outro:<br><br> ❌ Excesso de informação<br> ❌ Falta de organização mental<br> ❌ Ausência de um sistema de execução`,
+                        `Também não parece ser falta de informação.`,
                         'ai'
                     );
+                    await new Promise(r => setTimeout(r, 1000));
 
+                    await addMsg(
+                        `O padrão mais comum é:<br><br>❌ Excesso de informação<br>❌ Falta de organização mental<br>❌ Ausência de um sistema de execução`,
+                        'ai'
+                    );
                     step = 5;
-                    await runNarrative();
+                    runNarrative();
                 } else if (step === 5) {
                     await addMsg(
-                        `A maioria das pessoas acredita que precisa aprender mais.<br><br> Mas existe um limite.<br><br> Depois de certo ponto, mais informação gera mais confusão.`,
+                        `Quem evolui mais rápido não consome mais conteúdo.`,
                         'ai'
                     );
-                    await new Promise(r => setTimeout(r, 1200));
+                    await new Promise(r => setTimeout(r, 1000));
 
                     await addMsg(
-                        `Quem evolui mais rápido não é quem consome mais conteúdo.<br><br> É quem possui um sistema para transformar:<br><br> Informação → Conhecimento<br> Conhecimento → Decisão<br> Decisão → Ação`,
+                        `Possui um sistema para transformar:<br><br>Informação → Conhecimento<br>Conhecimento → Decisão<br>Decisão → Ação`,
                         'ai'
                     );
-
                     step = 6;
-                    await runNarrative();
+                    runNarrative();
                 } else if (step === 6) {
                     await addMsg(
-                        `Foi exatamente para resolver esse problema que o Nexus Manual foi criado.`,
+                        `Foi para isso que criamos o Nexus Manual.`,
                         'ai'
                     );
-                    await new Promise(r => setTimeout(r, 1200));
+                    await new Promise(r => setTimeout(r, 1000));
 
                     await addMsg(
-                        `Um sistema que integra:<br><br> ✓ Inteligência Artificial<br> ✓ Aprendizagem Estratégica<br> ✓ Organização Mental<br> ✓ Produtividade<br> ✓ Execução`,
+                        `Um sistema que integra:<br><br>✓ Inteligência Artificial<br>✓ Aprendizagem Estratégica<br>✓ Organização Mental<br>✓ Produtividade<br>✓ Execução`,
                         'ai'
                     );
-                    await new Promise(r => setTimeout(r, 1200));
+                    await new Promise(r => setTimeout(r, 1000));
 
-                    await addMsg(`Agora quero te mostrar como tudo isso funciona na prática.`, 'ai');
+                    await addMsg(
+                        `Veja como tudo isso funciona na prática.`,
+                        'ai'
+                    );
 
                     inputContainer.style.display = 'none';
                     ctaWrapper.style.display = 'block';
@@ -608,10 +568,9 @@
             }
 
             async function startChat() {
-                // Mensagem inicial de boas-vindas
-                await new Promise(r => setTimeout(r, 800));
+                await new Promise(r => setTimeout(r, 700));
                 await addMsg(
-                    `Bem-vindo.<br><br> Este não é um teste de inteligência.<br><br> É um diagnóstico rápido para descobrir se você está preparado para aprender, produzir e tomar decisões em uma era dominada pela Inteligência Artificial.<br><br> Leva menos de 2 minutos.<br><br> Antes de começarmos, qual é o seu nome?`,
+                    `Bem-vindo.<br><br>Este é um diagnóstico rápido para descobrir se você está pronto para aprender, produzir e decidir na era da IA.<br><br>Leva menos de 2 minutos.<br><br>Qual é o seu nome?`,
                     'ai'
                 );
             }
@@ -638,12 +597,10 @@
             });
 
             finalCtaBtn.addEventListener('click', () => {
-                // Ação do CTA - pode ser redirecionamento ou alerta
-                alert('Redirecionando para o Sistema Nexus...');
-                // window.location.href = 'https://...';
+                // Redirecionamento para o link solicitado
+                window.location.href = 'https://app.nexus-manual.com.br/';
             });
 
-            // Iniciar
             window.onload = () => {
                 startChat();
             };
