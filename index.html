@@ -7,8 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
             --primary: #4f8fff;
@@ -402,6 +401,15 @@
             let awaitingOption = false;
             let optionResolver = null;
 
+            // Armazenamento do perfil
+            const profile = {
+                perfil: null,      // resposta 1
+                ia: null,          // resposta 2
+                habilidade: null,  // resposta 3
+                informacao: null,  // resposta 4
+                obstaculo: null    // resposta 5
+            };
+
             function scrollToBottom() {
                 requestAnimationFrame(() => {
                     chatFlow.scrollTop = chatFlow.scrollHeight;
@@ -417,7 +425,7 @@
                     scrollToBottom();
 
                     const charCount = text.replace(/<[^>]*>/g, '').length;
-                    const readingTime = Math.min(Math.max(charCount * 70, 1600), 3800);
+                    const readingTime = Math.min(Math.max(charCount * 70, 1600), 4200);
                     setTimeout(resolve, readingTime);
                 });
             }
@@ -437,7 +445,7 @@
                     btn.innerHTML = `<span class="option-number">${index + 1}</span> ${opt}`;
                     btn.addEventListener('click', () => {
                         if (!awaitingOption) return;
-                        const selectedText = `${opt}`;
+                        const selectedText = opt;
                         removeOptions();
                         awaitingOption = false;
                         if (optionResolver) {
@@ -459,10 +467,63 @@
                 });
             }
 
+            // Função que gera análise personalizada com base no perfil
+            function gerarAnalise() {
+                let analise = '';
+
+                // Mapeamento do perfil principal (pergunta 1)
+                const perfilMap = {
+                    0: 'Você tem um potencial criativo forte, mas a execução ainda é um ponto de atrito.',
+                    1: 'Sua capacidade de absorver conteúdo é alta, porém a retenção e aplicação precisam ser trabalhadas.',
+                    2: 'A rotina está consumindo seu tempo com tarefas que poderiam ser automatizadas.',
+                    3: 'Foco e disciplina são os pilares que, uma vez fortalecidos, vão destravar seus resultados.'
+                };
+
+                // Mapeamento do uso de IA (pergunta 2)
+                const iaMap = {
+                    0: 'Você ainda não explora o potencial da IA como aliada no dia a dia.',
+                    1: 'Seu uso ocasional de IA mostra que você já percebeu o valor, mas ainda pode integrá-la mais profundamente.',
+                    2: 'Você já utiliza IA com frequência, o que é ótimo; o próximo passo é torná-la uma extensão do seu pensamento.',
+                    3: 'Você é um heavy user de IA, mas isso pode gerar dependência sem um sistema próprio de filtro e execução.'
+                };
+
+                // Mapeamento da habilidade desejada (pergunta 3)
+                const habilidadeMap = {
+                    0: 'Acelerar o aprendizado é sua prioridade, indicando que você valoriza conhecimento aplicado.',
+                    1: 'Produtividade é o foco, sinal de que você quer fazer mais em menos tempo.',
+                    2: 'Organização da rotina é a chave que você busca para ter mais controle.',
+                    3: 'Tomar decisões melhores mostra que você quer mais clareza e segurança nos próximos passos.'
+                };
+
+                // Mapeamento da relação com informação (pergunta 4)
+                const informacaoMap = {
+                    0: 'A sobrecarga de informação está te paralisando; você precisa de um filtro inteligente.',
+                    1: 'Você lida com um fluxo intenso, mas se sente no limite — organização mental é o remédio.',
+                    2: 'Você até gerencia bem, mas sente que poderia extrair mais valor do que consome.',
+                    3: 'Você tem uma relação saudável com a informação, mas falta um método para transformá-la em resultado.'
+                };
+
+                // Mapeamento do obstáculo (pergunta 5)
+                const obstaculoMap = {
+                    0: 'Manter o foco é seu maior desafio; distrações estão drenando sua energia.',
+                    1: 'A gestão do tempo é o gargalo; você precisa de um sistema que priorize o essencial.',
+                    2: 'Falta de clareza nos objetivos está te impedindo de avançar com consistência.',
+                    3: 'A motivação oscilante é o que trava sua execução; é necessário um motor interno à prova de altos e baixos.'
+                };
+
+                analise += perfilMap[profile.perfil] + ' ';
+                analise += iaMap[profile.ia] + ' ';
+                analise += habilidadeMap[profile.habilidade] + ' ';
+                analise += informacaoMap[profile.informacao] + ' ';
+                analise += obstaculoMap[profile.obstaculo];
+
+                return analise;
+            }
+
             async function runNarrative() {
                 if (step === 1) {
                     await addMsg(
-                        `Prazer em conhecê-lo, ${userName}.<br><br>Vou fazer algumas perguntas rápidas para entender seu perfil.`,
+                        `Prazer em conhecê-lo, ${userName}.<br><br>Vou fazer algumas perguntas rápidas para mapear seu perfil cognitivo e comportamental.`,
                         'ai'
                     );
 
@@ -473,12 +534,13 @@
                         'Dificuldade para manter foco e disciplina',
                     ]);
 
+                    profile.perfil = choice.index;
                     await addMsg(choice.text, 'user');
                     step = 2;
                     runNarrative();
                 } else if (step === 2) {
                     await addMsg(
-                        `Entendi.<br><br>Você utiliza Inteligência Artificial atualmente?`,
+                        `Entendi.<br><br>Qual é a sua relação atual com a Inteligência Artificial?`,
                         'ai'
                     );
 
@@ -489,6 +551,7 @@
                         'Utilizo todos os dias',
                     ]);
 
+                    profile.ia = choice.index;
                     await addMsg(choice.text, 'user');
                     step = 3;
                     runNarrative();
@@ -505,53 +568,78 @@
                         'Tomar decisões melhores',
                     ]);
 
+                    profile.habilidade = choice.index;
                     await addMsg(choice.text, 'user');
                     step = 4;
                     runNarrative();
                 } else if (step === 4) {
-                    await addMsg(`Analisando suas respostas...`, 'ai');
-                    await new Promise(r => setTimeout(r, 1400));
-
                     await addMsg(
-                        `${userName}, o problema não parece ser falta de capacidade.`,
+                        `Como você se sente em relação à quantidade de informações que consome diariamente?`,
                         'ai'
                     );
-                    await new Promise(r => setTimeout(r, 1000));
 
-                    await addMsg(
-                        `Também não parece ser falta de informação.`,
-                        'ai'
-                    );
-                    await new Promise(r => setTimeout(r, 1000));
+                    const choice = await waitForOption([
+                        'Sobrecarregado, mal consigo processar',
+                        'Intenso, mas ainda dou conta',
+                        'Razoável, mas poderia aproveitar melhor',
+                        'Tranquilo, mas falta um método',
+                    ]);
 
-                    await addMsg(
-                        `O padrão mais comum é:<br><br>❌ Excesso de informação<br>❌ Falta de organização mental<br>❌ Ausência de um sistema de execução`,
-                        'ai'
-                    );
+                    profile.informacao = choice.index;
+                    await addMsg(choice.text, 'user');
                     step = 5;
                     runNarrative();
                 } else if (step === 5) {
                     await addMsg(
-                        `Quem evolui mais rápido não consome mais conteúdo.`,
+                        `O que mais te impede de alcançar seus objetivos atualmente?`,
                         'ai'
                     );
-                    await new Promise(r => setTimeout(r, 1000));
 
-                    await addMsg(
-                        `Possui um sistema para transformar:<br><br>Informação → Conhecimento<br>Conhecimento → Decisão<br>Decisão → Ação`,
-                        'ai'
-                    );
+                    const choice = await waitForOption([
+                        'Foco e concentração',
+                        'Gestão do tempo',
+                        'Falta de clareza nos objetivos',
+                        'Motivação inconstante',
+                    ]);
+
+                    profile.obstaculo = choice.index;
+                    await addMsg(choice.text, 'user');
                     step = 6;
                     runNarrative();
                 } else if (step === 6) {
+                    // Processamento e análise personalizada
+                    await addMsg(`Processando suas respostas...`, 'ai');
+                    await new Promise(r => setTimeout(r, 1500));
+
+                    const analise = gerarAnalise();
+
                     await addMsg(
-                        `Foi para isso que criamos o Nexus Manual.`,
+                        `${userName}, o diagnóstico revelou o seguinte:<br><br>${analise}`,
+                        'ai'
+                    );
+                    await new Promise(r => setTimeout(r, 2000));
+
+                    await addMsg(
+                        `O ponto positivo é que você já reconhece esses padrões.<br><br>Isso é o primeiro passo para a mudança.`,
+                        'ai'
+                    );
+                    await new Promise(r => setTimeout(r, 1500));
+
+                    await addMsg(
+                        `O que falta agora é um sistema que conecte os pontos:<br><br>🧠 Clareza mental<br>⚡ Execução inteligente<br>📈 Evolução contínua`,
+                        'ai'
+                    );
+                    step = 7;
+                    runNarrative();
+                } else if (step === 7) {
+                    await addMsg(
+                        `Foi exatamente para isso que o Nexus Manual foi criado.`,
                         'ai'
                     );
                     await new Promise(r => setTimeout(r, 1000));
 
                     await addMsg(
-                        `Um sistema que integra:<br><br>✓ Inteligência Artificial<br>✓ Aprendizagem Estratégica<br>✓ Organização Mental<br>✓ Produtividade<br>✓ Execução`,
+                        `Um sistema completo que integra:<br><br>✓ Inteligência Artificial<br>✓ Aprendizagem Estratégica<br>✓ Organização Mental<br>✓ Produtividade<br>✓ Execução`,
                         'ai'
                     );
                     await new Promise(r => setTimeout(r, 1000));
@@ -597,7 +685,6 @@
             });
 
             finalCtaBtn.addEventListener('click', () => {
-                // Redirecionamento para o link solicitado
                 window.location.href = 'https://app.nexus-manual.com.br/';
             });
 
