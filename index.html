@@ -551,13 +551,13 @@
     async function runNarrative() {
         if (step === 1) {
             await addMsg(
-                `Prazer, ${userName}.<br><br>Sabia que <strong>8 em cada 10 pessoas</strong> que fazem este teste descobrem que o problema não é falta de capacidade, mas de método?<br><br>Vamos descobrir o seu caso.`,
+                `Prazer em te conhecer, ${userName}.<br><br>Você sabia que <strong>8 em cada 10 pessoas</strong> que fazem este teste descobrem que o problema não é falta de capacidade, mas de método?<br><br>Vamos descobrir o seu caso.`,
                 'ai'
             );
             await new Promise(r => setTimeout(r, 800));
 
             const choice = await waitForOption([
-                'Muitas ideias, mas dificuldade para executar',
+                'Tenho muitas ideias, mas dificuldade para executar',
                 'Estudo bastante, mas esqueço o que aprendo',
                 'Perco tempo com tarefas repetitivas',
                 'Dificuldade para manter foco e disciplina'
@@ -659,7 +659,7 @@
         await new Promise(r => setTimeout(r, 600));
         // Mensagem de abertura com identidade e autoridade
         await addMsg(
-            `<strong>Bem-vindo ao Nexus Manual.</strong><br><br>Sou Lucas Mendes, especialista em aceleração de aprendizado e produtividade.<br><br>Criei este diagnóstico de 2 minutos para ajudar você a identificar o que está bloqueando sua evolução na era da IA.<br><br>Qual é o seu nome?`,
+            `<strong>Bem-vindo ao Nexus Manual.</strong><br><br>Este diagnóstico de 2 minutos para ajudar você a identificar o que está bloqueando sua evolução na era da IA.<br><br>Para que possamos começar me diga, qual é o seu nome?`,
             'ai'
         );
     }
