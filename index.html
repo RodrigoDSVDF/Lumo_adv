@@ -27,8 +27,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        html,
-        body {
+        html, body {
             height: 100%;
             width: 100%;
             background-color: var(--bg-dark);
@@ -58,6 +57,7 @@
             height: 100dvh;
             max-width: 500px;
             margin: 0 auto;
+            overflow-x: hidden;
         }
 
         header {
@@ -113,10 +113,7 @@
         }
 
         @keyframes slideUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .bubble.ai {
@@ -127,7 +124,7 @@
             border: 1px solid var(--glass-border);
             color: var(--text-soft);
             border-bottom-left-radius: 8px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
 
         .bubble.user {
@@ -139,7 +136,7 @@
             color: #ffffff;
             border-bottom-right-radius: 8px;
             text-align: right;
-            box-shadow: 0 8px 24px rgba(0, 102, 255, 0.2);
+            box-shadow: 0 8px 24px rgba(0,102,255,0.2);
         }
 
         .options-container {
@@ -151,21 +148,15 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(6px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .option-btn {
-            background: rgba(20, 30, 50, 0.65);
+            background: rgba(20,30,50,0.65);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 16px;
             padding: 13px 16px;
             color: #ffffff;
@@ -177,14 +168,14 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
         .option-btn:active {
             transform: scale(0.97);
-            background: rgba(79, 143, 255, 0.2);
-            border-color: rgba(79, 143, 255, 0.45);
-            box-shadow: 0 0 18px rgba(0, 102, 255, 0.25);
+            background: rgba(79,143,255,0.2);
+            border-color: rgba(79,143,255,0.45);
+            box-shadow: 0 0 18px rgba(0,102,255,0.25);
         }
 
         .option-number {
@@ -202,11 +193,11 @@
         }
 
         #input-container {
-            padding: 10px 16px 22px;
+            padding: 10px 12px 22px;
             flex-shrink: 0;
             display: flex;
-            gap: 10px;
-            background: linear-gradient(to top, rgba(1, 4, 9, 0.95), transparent);
+            gap: 8px;
+            background: linear-gradient(to top, rgba(1,4,9,0.95), transparent);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             z-index: 5;
@@ -214,10 +205,11 @@
 
         #name-input {
             flex: 1;
-            background: rgba(20, 30, 50, 0.7);
+            min-width: 0;
+            background: rgba(20,30,50,0.7);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255,255,255,0.15);
             border-radius: 30px;
             padding: 13px 18px;
             color: #fff;
@@ -229,28 +221,29 @@
 
         #name-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 143, 255, 0.15);
-            background: rgba(25, 38, 62, 0.8);
+            box-shadow: 0 0 0 3px rgba(79,143,255,0.15);
+            background: rgba(25,38,62,0.8);
         }
 
         #name-input::placeholder {
-            color: rgba(255, 255, 255, 0.35);
+            color: rgba(255,255,255,0.35);
         }
 
         .send-btn {
             background: var(--primary);
             border: none;
             border-radius: 30px;
-            padding: 0 22px;
+            padding: 0 20px;
             color: #fff;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             letter-spacing: 0.5px;
             cursor: pointer;
             transition: all 0.25s ease;
-            box-shadow: 0 4px 15px rgba(0, 102, 255, 0.4);
+            box-shadow: 0 4px 15px rgba(0,102,255,0.4);
             text-transform: uppercase;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .send-btn:active {
@@ -258,11 +251,23 @@
             background: #2060cc;
         }
 
+        @media (max-width: 360px) {
+            .send-btn {
+                padding: 0 14px;
+                font-size: 0.8rem;
+                letter-spacing: 0;
+            }
+            #name-input {
+                padding: 13px 14px;
+                font-size: 0.9rem;
+            }
+        }
+
         #cta-wrapper {
             padding: 12px 16px 26px;
             flex-shrink: 0;
             display: none;
-            background: linear-gradient(to top, rgba(1, 4, 9, 0.95), transparent);
+            background: linear-gradient(to top, rgba(1,4,9,0.95), transparent);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             z-index: 5;
@@ -279,7 +284,7 @@
             font-size: 1rem;
             letter-spacing: 1px;
             cursor: pointer;
-            box-shadow: 0 8px 28px rgba(0, 102, 255, 0.5);
+            box-shadow: 0 8px 28px rgba(0,102,255,0.5);
             transition: all 0.3s ease;
             text-transform: uppercase;
             text-align: center;
@@ -287,411 +292,405 @@
         }
 
         @keyframes pulse-glow {
-            0%,
-            100% {
-                box-shadow: 0 8px 28px rgba(0, 102, 255, 0.5);
-            }
-            50% {
-                box-shadow: 0 8px 42px rgba(0, 150, 255, 0.8);
-            }
+            0%,100% { box-shadow: 0 8px 28px rgba(0,102,255,0.5); }
+            50% { box-shadow: 0 8px 42px rgba(0,150,255,0.8); }
         }
 
         .final-button:active {
             transform: scale(0.96);
-            box-shadow: 0 4px 20px rgba(0, 102, 255, 0.8);
+            box-shadow: 0 4px 20px rgba(0,102,255,0.8);
         }
 
-        #chat-flow::-webkit-scrollbar {
-            width: 4px;
-        }
-        #chat-flow::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        #chat-flow::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 4px;
-        }
+        #chat-flow::-webkit-scrollbar { width: 4px; }
+        #chat-flow::-webkit-scrollbar-track { background: transparent; }
+        #chat-flow::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
     </style>
 </head>
 <body>
-    <div id="canvas-container"></div>
-    <div class="app-wrapper">
-        <header>
-            <div class="title">VOCÊ ESTÁ PREPARADO PARA A ERA DA IA?</div>
-        </header>
-        <div id="chat-flow"></div>
-        <div id="input-container">
-            <input type="text" id="name-input" placeholder="Digite seu nome..." autocomplete="off">
-            <button class="send-btn" id="send-name-btn">Avançar</button>
-        </div>
-        <div id="cta-wrapper">
-            <button class="final-button" id="final-cta-btn">CONHECER O SISTEMA NEXUS</button>
-        </div>
+<div id="canvas-container"></div>
+<div class="app-wrapper">
+    <header>
+        <div class="title">VOCÊ ESTÁ PREPARADO PARA A ERA DA IA?</div>
+    </header>
+    <div id="chat-flow"></div>
+    <div id="input-container">
+        <input type="text" id="name-input" placeholder="Digite seu nome..." autocomplete="off">
+        <button class="send-btn" id="send-name-btn">Avançar</button>
     </div>
+    <div id="cta-wrapper">
+        <button class="final-button" id="final-cta-btn">CONHECER O SISTEMA NEXUS</button>
+    </div>
+</div>
 
-    <script>
-        (function() {
-            // --- THREE.JS BACKGROUND (leve) ---
-            const canvasContainer = document.getElementById('canvas-container');
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 28;
+<script>
+(function() {
+    // --- THREE.JS BACKGROUND ---
+    const canvasContainer = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 28;
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
+    canvasContainer.appendChild(renderer.domElement);
 
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.setClearColor(0x000000, 0);
-            canvasContainer.appendChild(renderer.domElement);
+    const particlesGeometry = new THREE.BufferGeometry();
+    const particlesCount = 450;
+    const posArray = new Float32Array(particlesCount * 3);
+    const speedArray = new Float32Array(particlesCount);
+    for (let i=0; i<particlesCount*3; i+=3) {
+        posArray[i] = (Math.random()-0.5)*70;
+        posArray[i+1] = (Math.random()-0.5)*45;
+        posArray[i+2] = (Math.random()-0.5)*35;
+        speedArray[i/3] = 0.003 + Math.random()*0.007;
+    }
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray,3));
+    const particlesMaterial = new THREE.PointsMaterial({
+        size: 0.1, color: 0x4f8fff, blending: THREE.AdditiveBlending,
+        depthWrite: false, transparent: true, opacity: 0.6
+    });
+    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particlesMesh);
 
-            const particlesGeometry = new THREE.BufferGeometry();
-            const particlesCount = 450;
-            const posArray = new Float32Array(particlesCount * 3);
-            const speedArray = new Float32Array(particlesCount);
+    function animateBackground() {
+        requestAnimationFrame(animateBackground);
+        const positions = particlesGeometry.attributes.position.array;
+        for (let i=0; i<positions.length; i+=3) {
+            positions[i+1] += speedArray[i/3]*0.5;
+            if (positions[i+1] > 22) positions[i+1] = -22;
+            if (positions[i+1] < -22) positions[i+1] = 22;
+        }
+        particlesGeometry.attributes.position.needsUpdate = true;
+        particlesMesh.rotation.y += 0.00015;
+        renderer.render(scene, camera);
+    }
+    animateBackground();
 
-            for (let i = 0; i < particlesCount * 3; i += 3) {
-                posArray[i] = (Math.random() - 0.5) * 70;
-                posArray[i + 1] = (Math.random() - 0.5) * 45;
-                posArray[i + 2] = (Math.random() - 0.5) * 35;
-                speedArray[i / 3] = 0.003 + Math.random() * 0.007;
-            }
-            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
 
-            const particlesMaterial = new THREE.PointsMaterial({
-                size: 0.1,
-                color: 0x4f8fff,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false,
-                transparent: true,
-                opacity: 0.6,
-            });
+    // --- CHAT LOGIC ---
+    const chatFlow = document.getElementById('chat-flow');
+    const inputContainer = document.getElementById('input-container');
+    const nameInput = document.getElementById('name-input');
+    const sendNameBtn = document.getElementById('send-name-btn');
+    const ctaWrapper = document.getElementById('cta-wrapper');
+    const finalCtaBtn = document.getElementById('final-cta-btn');
 
-            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-            scene.add(particlesMesh);
+    let step = 0;
+    let userName = '';
+    let awaitingOption = false;
+    let optionResolver = null;
 
-            function animateBackground() {
-                requestAnimationFrame(animateBackground);
-                const positions = particlesGeometry.attributes.position.array;
-                for (let i = 0; i < positions.length; i += 3) {
-                    positions[i + 1] += speedArray[i / 3] * 0.5;
-                    if (positions[i + 1] > 22) positions[i + 1] = -22;
-                    if (positions[i + 1] < -22) positions[i + 1] = 22;
-                }
-                particlesGeometry.attributes.position.needsUpdate = true;
-                particlesMesh.rotation.y += 0.00015;
-                renderer.render(scene, camera);
-            }
-            animateBackground();
+    // 7 dimensões do perfil
+    const profile = {
+        perfil: null,        // Q1
+        ia: null,            // Q2
+        habilidade: null,    // Q3
+        informacao: null,    // Q4
+        obstaculo: null,     // Q5
+        aprendizado: null,   // Q6 (nova)
+        forca: null          // Q7 (nova)
+    };
 
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
+    function scrollToBottom() {
+        requestAnimationFrame(() => { chatFlow.scrollTop = chatFlow.scrollHeight; });
+    }
 
-            // --- CHAT LOGIC ---
-            const chatFlow = document.getElementById('chat-flow');
-            const inputContainer = document.getElementById('input-container');
-            const nameInput = document.getElementById('name-input');
-            const sendNameBtn = document.getElementById('send-name-btn');
-            const ctaWrapper = document.getElementById('cta-wrapper');
-            const finalCtaBtn = document.getElementById('final-cta-btn');
+    function addMsg(text, sender) {
+        return new Promise(resolve => {
+            const bubble = document.createElement('div');
+            bubble.className = `bubble ${sender}`;
+            bubble.innerHTML = text;
+            chatFlow.appendChild(bubble);
+            scrollToBottom();
+            const charCount = text.replace(/<[^>]*>/g, '').length;
+            const readingTime = Math.min(Math.max(charCount * 70, 1600), 4200);
+            setTimeout(resolve, readingTime);
+        });
+    }
 
-            let step = 0;
-            let userName = '';
-            let awaitingOption = false;
-            let optionResolver = null;
+    function removeOptions() {
+        const existing = document.querySelector('.options-container');
+        if (existing) existing.remove();
+    }
 
-            // Armazenamento do perfil
-            const profile = {
-                perfil: null,      // resposta 1
-                ia: null,          // resposta 2
-                habilidade: null,  // resposta 3
-                informacao: null,  // resposta 4
-                obstaculo: null    // resposta 5
-            };
-
-            function scrollToBottom() {
-                requestAnimationFrame(() => {
-                    chatFlow.scrollTop = chatFlow.scrollHeight;
-                });
-            }
-
-            function addMsg(text, sender) {
-                return new Promise(resolve => {
-                    const bubble = document.createElement('div');
-                    bubble.className = `bubble ${sender}`;
-                    bubble.innerHTML = text;
-                    chatFlow.appendChild(bubble);
-                    scrollToBottom();
-
-                    const charCount = text.replace(/<[^>]*>/g, '').length;
-                    const readingTime = Math.min(Math.max(charCount * 70, 1600), 4200);
-                    setTimeout(resolve, readingTime);
-                });
-            }
-
-            function removeOptions() {
-                const existing = document.querySelector('.options-container');
-                if (existing) existing.remove();
-            }
-
-            function showOptions(options) {
+    function showOptions(options) {
+        removeOptions();
+        const container = document.createElement('div');
+        container.className = 'options-container';
+        options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<span class="option-number">${index+1}</span> ${opt}`;
+            btn.addEventListener('click', () => {
+                if (!awaitingOption) return;
                 removeOptions();
-                const container = document.createElement('div');
-                container.className = 'options-container';
-                options.forEach((opt, index) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'option-btn';
-                    btn.innerHTML = `<span class="option-number">${index + 1}</span> ${opt}`;
-                    btn.addEventListener('click', () => {
-                        if (!awaitingOption) return;
-                        const selectedText = opt;
-                        removeOptions();
-                        awaitingOption = false;
-                        if (optionResolver) {
-                            optionResolver({ index, text: selectedText });
-                            optionResolver = null;
-                        }
-                    });
-                    container.appendChild(btn);
-                });
-                chatFlow.appendChild(container);
-                scrollToBottom();
-            }
-
-            function waitForOption(options) {
-                return new Promise(resolve => {
-                    awaitingOption = true;
-                    optionResolver = resolve;
-                    showOptions(options);
-                });
-            }
-
-            // Função que gera análise personalizada com base no perfil
-            function gerarAnalise() {
-                let analise = '';
-
-                // Mapeamento do perfil principal (pergunta 1)
-                const perfilMap = {
-                    0: 'Você tem um potencial criativo forte, mas a execução ainda é um ponto de atrito.',
-                    1: 'Sua capacidade de absorver conteúdo é alta, porém a retenção e aplicação precisam ser trabalhadas.',
-                    2: 'A rotina está consumindo seu tempo com tarefas que poderiam ser automatizadas.',
-                    3: 'Foco e disciplina são os pilares que, uma vez fortalecidos, vão destravar seus resultados.'
-                };
-
-                // Mapeamento do uso de IA (pergunta 2)
-                const iaMap = {
-                    0: 'Você ainda não explora o potencial da IA como aliada no dia a dia.',
-                    1: 'Seu uso ocasional de IA mostra que você já percebeu o valor, mas ainda pode integrá-la mais profundamente.',
-                    2: 'Você já utiliza IA com frequência, o que é ótimo; o próximo passo é torná-la uma extensão do seu pensamento.',
-                    3: 'Você é um heavy user de IA, mas isso pode gerar dependência sem um sistema próprio de filtro e execução.'
-                };
-
-                // Mapeamento da habilidade desejada (pergunta 3)
-                const habilidadeMap = {
-                    0: 'Acelerar o aprendizado é sua prioridade, indicando que você valoriza conhecimento aplicado.',
-                    1: 'Produtividade é o foco, sinal de que você quer fazer mais em menos tempo.',
-                    2: 'Organização da rotina é a chave que você busca para ter mais controle.',
-                    3: 'Tomar decisões melhores mostra que você quer mais clareza e segurança nos próximos passos.'
-                };
-
-                // Mapeamento da relação com informação (pergunta 4)
-                const informacaoMap = {
-                    0: 'A sobrecarga de informação está te paralisando; você precisa de um filtro inteligente.',
-                    1: 'Você lida com um fluxo intenso, mas se sente no limite — organização mental é o remédio.',
-                    2: 'Você até gerencia bem, mas sente que poderia extrair mais valor do que consome.',
-                    3: 'Você tem uma relação saudável com a informação, mas falta um método para transformá-la em resultado.'
-                };
-
-                // Mapeamento do obstáculo (pergunta 5)
-                const obstaculoMap = {
-                    0: 'Manter o foco é seu maior desafio; distrações estão drenando sua energia.',
-                    1: 'A gestão do tempo é o gargalo; você precisa de um sistema que priorize o essencial.',
-                    2: 'Falta de clareza nos objetivos está te impedindo de avançar com consistência.',
-                    3: 'A motivação oscilante é o que trava sua execução; é necessário um motor interno à prova de altos e baixos.'
-                };
-
-                analise += perfilMap[profile.perfil] + ' ';
-                analise += iaMap[profile.ia] + ' ';
-                analise += habilidadeMap[profile.habilidade] + ' ';
-                analise += informacaoMap[profile.informacao] + ' ';
-                analise += obstaculoMap[profile.obstaculo];
-
-                return analise;
-            }
-
-            async function runNarrative() {
-                if (step === 1) {
-                    await addMsg(
-                        `Prazer em conhecê-lo, ${userName}.<br><br>Vou fazer algumas perguntas rápidas para mapear seu perfil cognitivo e comportamental.`,
-                        'ai'
-                    );
-
-                    const choice = await waitForOption([
-                        'Muitas ideias, mas dificuldade para executar',
-                        'Estudo bastante, mas esqueço o que aprendo',
-                        'Perco muito tempo com tarefas repetitivas',
-                        'Dificuldade para manter foco e disciplina',
-                    ]);
-
-                    profile.perfil = choice.index;
-                    await addMsg(choice.text, 'user');
-                    step = 2;
-                    runNarrative();
-                } else if (step === 2) {
-                    await addMsg(
-                        `Entendi.<br><br>Qual é a sua relação atual com a Inteligência Artificial?`,
-                        'ai'
-                    );
-
-                    const choice = await waitForOption([
-                        'Nunca utilizei',
-                        'Utilizo ocasionalmente',
-                        'Utilizo frequentemente',
-                        'Utilizo todos os dias',
-                    ]);
-
-                    profile.ia = choice.index;
-                    await addMsg(choice.text, 'user');
-                    step = 3;
-                    runNarrative();
-                } else if (step === 3) {
-                    await addMsg(
-                        `Se pudesse melhorar apenas UMA habilidade, qual seria?`,
-                        'ai'
-                    );
-
-                    const choice = await waitForOption([
-                        'Aprender mais rápido',
-                        'Ser mais produtivo',
-                        'Organizar melhor minha rotina',
-                        'Tomar decisões melhores',
-                    ]);
-
-                    profile.habilidade = choice.index;
-                    await addMsg(choice.text, 'user');
-                    step = 4;
-                    runNarrative();
-                } else if (step === 4) {
-                    await addMsg(
-                        `Como você se sente em relação à quantidade de informações que consome diariamente?`,
-                        'ai'
-                    );
-
-                    const choice = await waitForOption([
-                        'Sobrecarregado, mal consigo processar',
-                        'Intenso, mas ainda dou conta',
-                        'Razoável, mas poderia aproveitar melhor',
-                        'Tranquilo, mas falta um método',
-                    ]);
-
-                    profile.informacao = choice.index;
-                    await addMsg(choice.text, 'user');
-                    step = 5;
-                    runNarrative();
-                } else if (step === 5) {
-                    await addMsg(
-                        `O que mais te impede de alcançar seus objetivos atualmente?`,
-                        'ai'
-                    );
-
-                    const choice = await waitForOption([
-                        'Foco e concentração',
-                        'Gestão do tempo',
-                        'Falta de clareza nos objetivos',
-                        'Motivação inconstante',
-                    ]);
-
-                    profile.obstaculo = choice.index;
-                    await addMsg(choice.text, 'user');
-                    step = 6;
-                    runNarrative();
-                } else if (step === 6) {
-                    // Processamento e análise personalizada
-                    await addMsg(`Processando suas respostas...`, 'ai');
-                    await new Promise(r => setTimeout(r, 1500));
-
-                    const analise = gerarAnalise();
-
-                    await addMsg(
-                        `${userName}, o diagnóstico revelou o seguinte:<br><br>${analise}`,
-                        'ai'
-                    );
-                    await new Promise(r => setTimeout(r, 2000));
-
-                    await addMsg(
-                        `O ponto positivo é que você já reconhece esses padrões.<br><br>Isso é o primeiro passo para a mudança.`,
-                        'ai'
-                    );
-                    await new Promise(r => setTimeout(r, 1500));
-
-                    await addMsg(
-                        `O que falta agora é um sistema que conecte os pontos:<br><br>🧠 Clareza mental<br>⚡ Execução inteligente<br>📈 Evolução contínua`,
-                        'ai'
-                    );
-                    step = 7;
-                    runNarrative();
-                } else if (step === 7) {
-                    await addMsg(
-                        `Foi exatamente para isso que o Nexus Manual foi criado.`,
-                        'ai'
-                    );
-                    await new Promise(r => setTimeout(r, 1000));
-
-                    await addMsg(
-                        `Um sistema completo que integra:<br><br>✓ Inteligência Artificial<br>✓ Aprendizagem Estratégica<br>✓ Organização Mental<br>✓ Produtividade<br>✓ Execução`,
-                        'ai'
-                    );
-                    await new Promise(r => setTimeout(r, 1000));
-
-                    await addMsg(
-                        `Veja como tudo isso funciona na prática.`,
-                        'ai'
-                    );
-
-                    inputContainer.style.display = 'none';
-                    ctaWrapper.style.display = 'block';
-                    scrollToBottom();
+                awaitingOption = false;
+                if (optionResolver) {
+                    optionResolver({ index, text: opt });
+                    optionResolver = null;
                 }
-            }
-
-            async function startChat() {
-                await new Promise(r => setTimeout(r, 700));
-                await addMsg(
-                    `Bem-vindo.<br><br>Este é um diagnóstico rápido para descobrir se você está pronto para aprender, produzir e decidir na era da IA.<br><br>Leva menos de 2 minutos.<br><br>Qual é o seu nome?`,
-                    'ai'
-                );
-            }
-
-            function submitName() {
-                const name = nameInput.value.trim();
-                if (!name) {
-                    nameInput.style.borderColor = '#ff4d4d';
-                    nameInput.focus();
-                    setTimeout(() => { nameInput.style.borderColor = ''; }, 1500);
-                    return;
-                }
-                userName = name;
-                addMsg(name, 'user').then(() => {
-                    inputContainer.style.display = 'none';
-                    step = 1;
-                    runNarrative();
-                });
-            }
-
-            sendNameBtn.addEventListener('click', submitName);
-            nameInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') submitName();
             });
+            container.appendChild(btn);
+        });
+        chatFlow.appendChild(container);
+        scrollToBottom();
+    }
 
-            finalCtaBtn.addEventListener('click', () => {
-                window.location.href = 'https://app.nexus-manual.com.br/';
-            });
+    function waitForOption(options) {
+        return new Promise(resolve => {
+            awaitingOption = true;
+            optionResolver = resolve;
+            showOptions(options);
+        });
+    }
 
-            window.onload = () => {
-                startChat();
-            };
-        })();
-    </script>
+    // --- SISTEMA DE DIAGNÓSTICO DIVERSIFICADO ---
+    function gerarDiagnostico(p) {
+        // Determinamos um perfil principal baseado nas respostas
+        let tipo = '';
+        let pontosFortes = [];
+        let pontosAtencao = [];
+        let recomendacao = '';
+
+        // Lógica de classificação
+        if (p.perfil === 0 && p.obstaculo === 0) {
+            tipo = 'Criativo Bloqueado';
+            pontosFortes.push('Grande capacidade de ideação e criatividade');
+            pontosFortes.push('Visão ampla e pensamento divergente');
+            pontosAtencao.push('Dificuldade em transformar ideias em ações concretas');
+            pontosAtencao.push('Tendência a se dispersar com múltiplas possibilidades');
+            recomendacao = 'Você precisa de um sistema que canalize sua criatividade para execução, com priorização clara e marcos de entrega.';
+        } else if (p.perfil === 1 && p.informacao <= 1) {
+            tipo = 'Estudante Sobrecarregado';
+            pontosFortes.push('Dedicação aos estudos e busca por conhecimento');
+            pontosFortes.push('Capacidade de absorver grande volume de informações');
+            pontosAtencao.push('Baixa retenção e aplicação prática do que aprende');
+            pontosAtencao.push('Sobrecarga informacional gerando paralisia');
+            recomendacao = 'Seu desafio não é aprender mais, mas sim organizar e aplicar o conhecimento. Um método de síntese e revisão é essencial.';
+        } else if (p.perfil === 2 && p.ia >= 2) {
+            tipo = 'Executante Disperso';
+            pontosFortes.push('Disposição para agir e realizar tarefas');
+            pontosFortes.push('Familiaridade com ferramentas de IA');
+            pontosAtencao.push('Perda de tempo com atividades repetitivas que poderiam ser automatizadas');
+            pontosAtencao.push('Falta de um fluxo de trabalho otimizado');
+            recomendacao = 'Você já usa tecnologia, mas ainda não extrai o máximo dela. Automatize processos e libere tempo para o estratégico.';
+        } else if (p.habilidade === 0 && p.aprendizado === 1) {
+            tipo = 'Aprendiz Visual';
+            pontosFortes.push('Alta motivação para aprender');
+            pontosFortes.push('Preferência por formatos visuais e interativos');
+            pontosAtencao.push('Pode se frustrar com métodos tradicionais de estudo');
+            pontosAtencao.push('Necessidade de estímulos variados para manter o foco');
+            recomendacao = 'Combine mapas mentais, vídeos e prática ativa. O Nexus Manual oferece exatamente essa abordagem multimodal.';
+        } else if (p.forca === 0 && p.obstaculo === 2) {
+            tipo = 'Estrategista com Propósito';
+            pontosFortes.push('Resiliência e determinação notáveis');
+            pontosFortes.push('Capacidade de superar adversidades');
+            pontosAtencao.push('Falta de clareza nos objetivos de longo prazo');
+            pontosAtencao.push('Risco de se esforçar muito na direção errada');
+            recomendacao = 'Defina metas claras e mensuráveis. Sua força precisa de um alvo bem definido para gerar resultados extraordinários.';
+        } else if (p.ia === 0 && p.informacao === 0) {
+            tipo = 'Explorador Iniciante';
+            pontosFortes.push('Mente fresca e sem vícios tecnológicos');
+            pontosFortes.push('Potencial para adotar as melhores práticas desde o início');
+            pontosAtencao.push('Desconexão com as ferramentas atuais de produtividade');
+            pontosAtencao.push('Sobrecarga informacional sem filtros');
+            recomendacao = 'Comece com o básico: um sistema de gestão de informações e introdução gradual à IA como assistente pessoal.';
+        } else if (p.ia === 3 && p.informacao >= 2) {
+            tipo = 'Tecnologista Avançado';
+            pontosFortes.push('Uso intensivo de IA e tecnologia');
+            pontosFortes.push('Alta exposição a informações relevantes');
+            pontosAtencao.push('Risco de dependência tecnológica sem critério próprio');
+            pontosAtencao.push('Pode estar consumindo mais do que produzindo');
+            recomendacao = 'Você está na fronteira. Agora precisa de um sistema de curadoria e execução que vá além da IA, integrando sua intuição e decisão estratégica.';
+        } else if (p.aprendizado === 2 || p.aprendizado === 3) {
+            tipo = 'Prático Experimentador';
+            pontosFortes.push('Aprendizado focado na prática e na experiência direta');
+            pontosFortes.push('Capacidade de aprender fazendo');
+            pontosAtencao.push('Pode pular etapas importantes de fundamentação');
+            pontosAtencao.push('Necessidade de equilibrar teoria e prática');
+            recomendacao = 'Alterne entre ciclos de estudo e aplicação imediata. O método "aprender-praticar-ensinar" será seu maior aliado.';
+        } else if (p.forca === 2 && p.habilidade === 2) {
+            tipo = 'Organizador Natural';
+            pontosFortes.push('Talento para estruturar e organizar');
+            pontosFortes.push('Busca por eficiência e ordem');
+            pontosAtencao.push('Pode se prender demais a sistemas e perder flexibilidade');
+            pontosAtencao.push('Risco de perfeccionismo paralisante');
+            recomendacao = 'Use sua habilidade organizacional para criar um sistema pessoal, mas lembre-se: a ação imperfeita supera o planejamento perfeito.';
+        } else {
+            // Perfil genérico mas ainda personalizado com base nas respostas
+            tipo = 'Em Transição';
+            pontosFortes.push('Autoconhecimento em desenvolvimento');
+            pontosFortes.push('Disposição para identificar áreas de melhoria');
+            pontosAtencao.push('Múltiplas frentes para trabalhar simultaneamente');
+            pontosAtencao.push('Necessidade de um plano estruturado de evolução');
+            recomendacao = 'Seu perfil indica que você está no momento certo para adotar um sistema integrado. O Nexus Manual foi desenhado para pessoas exatamente como você.';
+        }
+
+        // Adiciona pontos extras com base em respostas específicas
+        if (p.ia >= 2) pontosFortes.push('Familiaridade com IA como vantagem competitiva');
+        if (p.habilidade === 3) pontosFortes.push('Busca por clareza decisória – sinal de maturidade');
+        if (p.obstaculo === 1) pontosAtencao.push('Gestão do tempo é uma oportunidade de melhoria imediata');
+        if (p.forca === 1) pontosFortes.push('Criatividade como diferencial para inovação');
+        if (p.forca === 3) pontosFortes.push('Capacidade analítica para resolver problemas complexos');
+
+        return {
+            tipo,
+            pontosFortes: [...new Set(pontosFortes)], // remove duplicatas
+            pontosAtencao: [...new Set(pontosAtencao)],
+            recomendacao
+        };
+    }
+
+    async function runNarrative() {
+        if (step === 1) {
+            await addMsg(`Prazer em conhecê-lo, ${userName}.<br><br>Vou fazer algumas perguntas para mapear seu perfil.`, 'ai');
+            const choice = await waitForOption([
+                'Muitas ideias, mas dificuldade para executar',
+                'Estudo bastante, mas esqueço o que aprendo',
+                'Perco muito tempo com tarefas repetitivas',
+                'Dificuldade para manter foco e disciplina'
+            ]);
+            profile.perfil = choice.index;
+            await addMsg(choice.text, 'user');
+            step = 2; runNarrative();
+        } else if (step === 2) {
+            await addMsg(`Qual é a sua relação atual com a Inteligência Artificial?`, 'ai');
+            const choice = await waitForOption([
+                'Nunca utilizei',
+                'Utilizo ocasionalmente',
+                'Utilizo frequentemente',
+                'Utilizo todos os dias'
+            ]);
+            profile.ia = choice.index;
+            await addMsg(choice.text, 'user');
+            step = 3; runNarrative();
+        } else if (step === 3) {
+            await addMsg(`Se pudesse melhorar apenas UMA habilidade, qual seria?`, 'ai');
+            const choice = await waitForOption([
+                'Aprender mais rápido',
+                'Ser mais produtivo',
+                'Organizar melhor minha rotina',
+                'Tomar decisões melhores'
+            ]);
+            profile.habilidade = choice.index;
+            await addMsg(choice.text, 'user');
+            step = 4; runNarrative();
+        } else if (step === 4) {
+            await addMsg(`Como você se sente em relação ao volume de informações que consome?`, 'ai');
+            const choice = await waitForOption([
+                'Sobrecarregado, mal consigo processar',
+                'Intenso, mas ainda dou conta',
+                'Razoável, mas poderia aproveitar melhor',
+                'Tranquilo, mas falta um método'
+            ]);
+            profile.informacao = choice.index;
+            await addMsg(choice.text, 'user');
+            step = 5; runNarrative();
+        } else if (step === 5) {
+            await addMsg(`O que mais te impede de alcançar seus objetivos?`, 'ai');
+            const choice = await waitForOption([
+                'Foco e concentração',
+                'Gestão do tempo',
+                'Falta de clareza nos objetivos',
+                'Motivação inconstante'
+            ]);
+            profile.obstaculo = choice.index;
+            await addMsg(choice.text, 'user');
+            step = 6; runNarrative();
+        } else if (step === 6) {
+            // NOVA PERGUNTA 6
+            await addMsg(`Como você aprende melhor?`, 'ai');
+            const choice = await waitForOption([
+                'Lendo e fazendo anotações',
+                'Assistindo vídeos e ouvindo explicações',
+                'Praticando e experimentando',
+                'Ensinando ou discutindo com outros'
+            ]);
+            profile.aprendizado = choice.index;
+            await addMsg(choice.text, 'user');
+            step = 7; runNarrative();
+        } else if (step === 7) {
+            // NOVA PERGUNTA 7
+            await addMsg(`Qual você considera sua maior força?`, 'ai');
+            const choice = await waitForOption([
+                'Resiliência e determinação',
+                'Criatividade e inovação',
+                'Organização e planejamento',
+                'Análise e pensamento crítico'
+            ]);
+            profile.forca = choice.index;
+            await addMsg(choice.text, 'user');
+            step = 8; runNarrative();
+        } else if (step === 8) {
+            await addMsg(`Processando seu diagnóstico personalizado...`, 'ai');
+            await new Promise(r => setTimeout(r, 1800));
+
+            const diag = gerarDiagnostico(profile);
+
+            await addMsg(
+                `${userName}, seu perfil é <strong>${diag.tipo}</strong>.<br><br>` +
+                `<strong>✅ Pontos fortes:</strong><br>• ${diag.pontosFortes.join('<br>• ')}<br><br>` +
+                `<strong>⚠️ Pontos de atenção:</strong><br>• ${diag.pontosAtencao.join('<br>• ')}`,
+                'ai'
+            );
+            await new Promise(r => setTimeout(r, 2500));
+
+            await addMsg(
+                `<strong>Recomendação:</strong><br>${diag.recomendacao}`,
+                'ai'
+            );
+            await new Promise(r => setTimeout(r, 2000));
+
+            await addMsg(
+                `O Nexus Manual foi projetado para atuar exatamente nesses pontos, integrando IA, organização e execução em um único sistema.`,
+                'ai'
+            );
+            step = 9; runNarrative();
+        } else if (step === 9) {
+            await addMsg(`Um sistema completo que integra:<br><br>✓ Inteligência Artificial<br>✓ Aprendizagem Estratégica<br>✓ Organização Mental<br>✓ Produtividade<br>✓ Execução`, 'ai');
+            await new Promise(r => setTimeout(r, 1000));
+            await addMsg(`Veja como tudo isso funciona na prática.`, 'ai');
+            inputContainer.style.display = 'none';
+            ctaWrapper.style.display = 'block';
+            scrollToBottom();
+        }
+    }
+
+    async function startChat() {
+        await new Promise(r => setTimeout(r, 700));
+        await addMsg(`Bem-vindo.<br><br>Este é um diagnóstico para descobrir se você está pronto para a era da IA.<br><br>São 7 perguntas, menos de 2 minutos.<br><br>Qual é o seu nome?`, 'ai');
+    }
+
+    function submitName() {
+        const name = nameInput.value.trim();
+        if (!name) {
+            nameInput.style.borderColor = '#ff4d4d';
+            nameInput.focus();
+            setTimeout(() => { nameInput.style.borderColor = ''; }, 1500);
+            return;
+        }
+        userName = name;
+        addMsg(name, 'user').then(() => {
+            inputContainer.style.display = 'none';
+            step = 1;
+            runNarrative();
+        });
+    }
+
+    sendNameBtn.addEventListener('click', submitName);
+    nameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') submitName(); });
+    finalCtaBtn.addEventListener('click', () => {
+        window.location.href = 'https://app.nexus-manual.com.br/';
+    });
+
+    window.onload = () => { startChat(); };
+})();
+</script>
 </body>
 </html>
