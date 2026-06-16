@@ -7,10 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
-    <!-- Three.js Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
     <style>
         :root {
             --bg-color: #050508;
@@ -20,26 +17,9 @@
             --text-main: #FFFFFF;
             --text-dim: #B0B0B0;
             --gradient-primary: linear-gradient(90deg, #00C6FF, #0072FF);
-            
-            --metallic-silver: linear-gradient(
-                135deg, 
-                #f0f0f0 0%, 
-                #808080 20%, 
-                #e0e0e0 40%, 
-                #ffffff 50%, 
-                #a0a0a0 60%, 
-                #dcdcdc 80%, 
-                #f0f0f0 100%
-            );
+            --metallic-silver: linear-gradient(135deg, #f0f0f0 0%, #808080 20%, #e0e0e0 40%, #ffffff 50%, #a0a0a0 60%, #dcdcdc 80%, #f0f0f0 100%);
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
@@ -51,17 +31,15 @@
             height: 100vh;
             position: relative;
         }
-
-        #galaxy-bg {
+        #galaxy-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: #000; }
+        /* Fallback para quando WebGL não está disponível */
+        #webgl-fallback {
+            display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            background: #000;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a15 50%, #050508 100%);
         }
-
         header {
             padding: 25px 15px;
             text-align: center;
@@ -71,7 +49,6 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
             flex-shrink: 0;
         }
-
         header h1 {
             font-weight: 800;
             font-size: 1.6rem;
@@ -87,341 +64,137 @@
             line-height: 1.2;
             display: inline-block;
         }
-
-        @keyframes silver-shine {
-            to { background-position: 200% center; }
-        }
-
-        header p {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            margin-top: 6px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            opacity: 0.8;
-        }
-
-        /* Barra de progresso */
+        @keyframes silver-shine { to { background-position: 200% center; } }
+        header p { font-size: 0.7rem; color: var(--text-dim); margin-top: 6px; letter-spacing: 3px; text-transform: uppercase; opacity: 0.8; }
         #progress-container {
-            max-width: 850px;
-            margin: 0 auto;
-            padding: 0 20px 10px;
-            z-index: 99;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            opacity: 0;
-            transform: translateY(-5px);
+            max-width: 850px; margin: 0 auto; padding: 0 20px 10px;
+            z-index: 99; display: flex; align-items: center; gap: 12px;
+            opacity: 0; transform: translateY(-5px);
             transition: opacity 0.5s ease, transform 0.5s ease;
         }
-
-        #progress-container.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        #progress-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-dim);
-            white-space: nowrap;
-        }
-
-        #progress-text {
-            color: var(--accent-cyan);
-            font-weight: 600;
-        }
-
-        #progress-bar {
-            flex: 1;
-            height: 3px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-        }
-
+        #progress-container.visible { opacity: 1; transform: translateY(0); }
+        #progress-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); white-space: nowrap; }
+        #progress-text { color: var(--accent-cyan); font-weight: 600; }
+        #progress-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; position: relative; }
         #progress-fill {
-            height: 100%;
-            width: 0%;
+            height: 100%; width: 0%;
             background: var(--gradient-primary);
             border-radius: 10px;
             transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 0 12px rgba(0, 212, 255, 0.5);
             position: relative;
         }
-
         #progress-fill::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 6px;
-            height: 6px;
-            background: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 8px rgba(0, 212, 255, 0.9);
-            opacity: 0.9;
+            content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+            width: 6px; height: 6px; background: #fff; border-radius: 50%;
+            box-shadow: 0 0 8px rgba(0, 212, 255, 0.9); opacity: 0.9;
         }
-
         #chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 30px 20px;
-            max-width: 850px;
-            margin: 0 auto;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            z-index: 10;
-            scrollbar-width: none;
-            padding-bottom: 160px; 
+            flex: 1; overflow-y: auto; padding: 30px 20px;
+            max-width: 850px; margin: 0 auto; width: 100%;
+            display: flex; flex-direction: column; gap: 24px;
+            z-index: 10; scrollbar-width: none; padding-bottom: 160px;
         }
-
         #chat-container::-webkit-scrollbar { display: none; }
-
         .message {
-            max-width: 85%;
-            padding: 20px 24px;
-            font-size: 0.95rem;
+            max-width: 85%; padding: 20px 24px; font-size: 0.95rem;
             animation: fadeIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-            word-wrap: break-word;
-            backdrop-filter: blur(15px);
+            word-wrap: break-word; backdrop-filter: blur(15px);
             border: 1px solid rgba(255,255,255,0.12);
             box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            position: relative;
-            line-height: 1.6;
+            position: relative; line-height: 1.6;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .assistant {
-            align-self: flex-start;
-            background-color: var(--assistant-bg);
-            border-radius: 4px 24px 24px 24px;
-            border-left: 4px solid rgba(255,255,255,0.4);
-            color: #f0f0f0;
-        }
-
-        .user {
-            align-self: flex-end;
-            background-color: var(--user-bg);
-            border-radius: 24px 24px 4px 24px;
-            border-right: 4px solid var(--accent-cyan);
-            color: #fff;
-            text-align: right;
-        }
-
-        /* Botões de opção dentro do chat */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .assistant { align-self: flex-start; background-color: var(--assistant-bg); border-radius: 4px 24px 24px 24px; border-left: 4px solid rgba(255,255,255,0.4); color: #f0f0f0; }
+        .user { align-self: flex-end; background-color: var(--user-bg); border-radius: 24px 24px 4px 24px; border-right: 4px solid var(--accent-cyan); color: #fff; text-align: right; }
         .options-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 8px;
+            display: flex; flex-direction: column; gap: 8px; margin-top: 8px;
             animation: fadeIn 0.35s ease 0.15s both;
-            align-self: flex-start;
-            width: 100%;
-            max-width: 85%;
+            align-self: flex-start; width: 100%; max-width: 85%;
         }
-
         .option-btn {
             background: rgba(20, 22, 38, 0.75);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 16px;
-            padding: 14px 18px;
-            color: #ffffff;
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 16px;
+            padding: 14px 18px; color: #ffffff; font-size: 0.9rem; font-weight: 500;
+            text-align: left; cursor: pointer; transition: all 0.25s ease;
+            display: flex; align-items: center; gap: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
-
-        .option-btn:active {
-            transform: scale(0.97);
-            background: rgba(0, 212, 255, 0.15);
-            border-color: rgba(0, 212, 255, 0.5);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
-        }
-
+        .option-btn:active { transform: scale(0.97); background: rgba(0, 212, 255, 0.15); border-color: rgba(0, 212, 255, 0.5); box-shadow: 0 0 20px rgba(0, 212, 255, 0.2); }
         .option-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 26px;
-            height: 26px;
-            background: var(--gradient-primary);
-            color: #fff;
-            border-radius: 50%;
-            font-weight: 700;
-            font-size: 0.8rem;
-            flex-shrink: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 26px; height: 26px; background: var(--gradient-primary);
+            color: #fff; border-radius: 50%; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
         }
-
-        /* Área de input */
         .input-area {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
+            position: fixed; bottom: 0; left: 0; width: 100%;
             background: linear-gradient(to top, var(--bg-color) 80%, transparent);
-            padding: 20px 20px 45px 20px;
-            z-index: 100;
+            padding: 20px 20px 45px 20px; z-index: 100;
         }
-
         .input-wrapper {
-            max-width: 700px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(20, 20, 35, 0.98);
-            padding: 10px 10px 10px 26px;
-            border-radius: 50px;
-            border: 1px solid rgba(255,255,255,0.25);
-            box-shadow: 0 15px 50px rgba(0,0,0,0.7);
-            backdrop-filter: blur(30px);
+            max-width: 700px; margin: 0 auto; display: flex; align-items: center; gap: 12px;
+            background: rgba(20, 20, 35, 0.98); padding: 10px 10px 10px 26px;
+            border-radius: 50px; border: 1px solid rgba(255,255,255,0.25);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.7); backdrop-filter: blur(30px);
         }
-
-        input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            padding: 12px 0;
-            font-size: 1.1rem;
-            outline: none;
-            min-width: 0;
-        }
-
-        input::placeholder {
-            color: rgba(255,255,255,0.35);
-        }
-
+        input { flex: 1; background: transparent; border: none; color: white; padding: 12px 0; font-size: 1.1rem; outline: none; min-width: 0; }
+        input::placeholder { color: rgba(255,255,255,0.35); }
         button#send-btn {
-            background: var(--metallic-silver);
-            border: none;
-            color: #000;
-            height: 52px;
-            padding: 0 32px;
-            border-radius: 40px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 1.5px;
-            flex-shrink: 0;
+            background: var(--metallic-silver); border: none; color: #000;
+            height: 52px; padding: 0 32px; border-radius: 40px; font-weight: 800;
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1.5px; flex-shrink: 0;
         }
-        
-        button#send-btn:active {
-            transform: scale(0.94);
-            filter: brightness(0.9);
-        }
-
-        /* CTA FINAL */
+        button#send-btn:active { transform: scale(0.94); filter: brightness(0.9); }
         #final-cta {
-            background: rgba(10, 10, 20, 0.98);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 30px;
-            padding: 45px 30px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-            display: none;
-            backdrop-filter: blur(30px);
-            box-shadow: 0 25px 70px rgba(0,0,0,0.9);
-            width: 100%;
-            max-width: 100%;
-            animation: fadeIn 0.8s ease-out forwards;
-            align-self: center;
+            background: rgba(10, 10, 20, 0.98); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px; padding: 45px 30px; margin-top: 20px; margin-bottom: 20px;
+            text-align: center; display: none; backdrop-filter: blur(30px);
+            box-shadow: 0 25px 70px rgba(0,0,0,0.9); width: 100%; max-width: 100%;
+            animation: fadeIn 0.8s ease-out forwards; align-self: center;
         }
-
-        .cta-title { 
-            font-weight: 800; 
-            font-size: 1.6rem; 
-            margin-bottom: 12px;
-            background: var(--metallic-silver);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: silver-shine 6s linear infinite;
+        .cta-title {
+            font-weight: 800; font-size: 1.6rem; margin-bottom: 12px;
+            background: var(--metallic-silver); background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; animation: silver-shine 6s linear infinite;
         }
-
         .benefits { text-align: left; margin: 25px 0; font-size: 0.95rem; list-style: none; display: inline-block; }
         .benefits li { margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
-
         .nexus-btn {
-            display: block;
-            width: 100%;
-            padding: 22px;
-            background: var(--gradient-primary);
-            color: white;
-            text-decoration: none;
-            border-radius: 16px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            box-shadow: 0 12px 45px rgba(0, 198, 255, 0.45);
-            transition: all 0.4s;
-            cursor: pointer;
-            border: none;
+            display: block; width: 100%; padding: 22px;
+            background: var(--gradient-primary); color: white; text-decoration: none;
+            border-radius: 16px; font-weight: 800; font-size: 1.1rem; text-transform: uppercase;
+            box-shadow: 0 12px 45px rgba(0, 198, 255, 0.45); transition: all 0.4s;
+            cursor: pointer; border: none;
         }
-
         .nexus-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
         .nexus-btn:active { transform: translateY(0); }
-
-        /* MOBILE OPTIMIZATION */
+        /* Toast de notificação */
+        #toast {
+            position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: rgba(0, 212, 255, 0.15); border: 1px solid rgba(0, 212, 255, 0.4);
+            color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 0.8rem;
+            letter-spacing: 1px; z-index: 200; opacity: 0;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            backdrop-filter: blur(20px); pointer-events: none;
+        }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         @media (max-width: 600px) {
             header h1 { font-size: 1.3rem; }
-            #chat-container { 
-                padding: 30px 18px 200px 18px; 
-                gap: 20px; 
-            }
-            .message { 
-                max-width: 90%;
-                font-size: 0.9rem; 
-                padding: 16px 20px;
-            }
+            #chat-container { padding: 30px 18px 200px 18px; gap: 20px; }
+            .message { max-width: 90%; font-size: 0.9rem; padding: 16px 20px; }
             .assistant { border-left-width: 3px; }
             .user { border-right-width: 3px; }
-            
             button#send-btn { padding: 0 20px; font-size: 0.75rem; height: 48px; }
             .input-area { padding: 15px 15px 30px 15px; }
             .input-wrapper { padding-left: 20px; }
-
-            .option-btn {
-                padding: 12px 14px;
-                font-size: 0.8rem;
-            }
-
-            #final-cta {
-                padding: 35px 20px;
-                margin-top: 10px;
-            }
-
-            #progress-container {
-                padding: 0 18px 8px;
-                gap: 8px;
-            }
-            #progress-label {
-                font-size: 0.65rem;
-            }
+            .option-btn { padding: 12px 14px; font-size: 0.8rem; }
+            #final-cta { padding: 35px 20px; margin-top: 10px; }
+            #progress-container { padding: 0 18px 8px; gap: 8px; }
+            #progress-label { font-size: 0.65rem; }
         }
-
         @media (max-width: 400px) {
             #chat-container { padding: 20px 12px 180px 12px; }
             .input-area { padding: 10px 10px 25px 10px; }
@@ -429,28 +202,29 @@
             button#send-btn { padding: 0 16px; font-size: 0.7rem; height: 44px; }
             input { font-size: 0.95rem; }
         }
+        @media (prefers-reduced-motion: reduce) {
+            .message, .options-container { animation: none; }
+            #progress-fill { transition: none; }
+        }
     </style>
 </head>
 <body>
 
     <canvas id="galaxy-bg"></canvas>
+    <div id="webgl-fallback"></div>
+    <div id="toast"></div>
 
     <header>
         <h1>Ecossistema Nexus</h1>
         <p>Inteligência • Estrutura • Performance</p>
     </header>
 
-    <!-- Barra de progresso do diagnóstico -->
     <div id="progress-container">
         <div id="progress-label">Diagnóstico • <span id="progress-text">0/7</span></div>
-        <div id="progress-bar">
-            <div id="progress-fill"></div>
-        </div>
+        <div id="progress-bar"><div id="progress-fill"></div></div>
     </div>
 
     <main id="chat-container">
-        <!-- Mensagens serão inseridas aqui via JS -->
-        <!-- CTA final posicionado no final do container -->
         <div id="final-cta">
             <div class="cta-title">ACESSO LIBERADO 🔓</div>
             <p style="color: #bbb; font-size: 0.95rem;">Seu novo sistema operacional de inteligência.</p>
@@ -471,484 +245,529 @@
     </div>
 
     <script>
-        // --- THREE.JS GALAXY ENGINE (versão realista: núcleo quente + azul suave) ---
+    // ─── 1. THREE.JS COM FALLBACK PARA WEBGL ───────────────────────────────────
+    (function() {
         const canvas = document.getElementById('galaxy-bg');
-        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        const fallback = document.getElementById('webgl-fallback');
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
-        camera.position.z = 4.5;
-        camera.position.y = 1.0;
-        camera.rotation.x = -0.25;
+        function isWebGLAvailable() {
+            try {
+                const testCanvas = document.createElement('canvas');
+                return !!(
+                    window.WebGLRenderingContext &&
+                    (testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl'))
+                );
+            } catch(e) {
+                return false;
+            }
+        }
 
-        const parameters = {
-            count: 35000,
-            size: 0.008,
-            radius: 5,
-            branches: 3,
-            spin: 1.2,
-            randomness: 0.4,
-            randomnessPower: 3,
-            insideColor: '#ffe6b3',   // amarelo-alaranjado claro (núcleo quente)
-            outsideColor: '#4d7eb3'   // azul acinzentado (braços frios)
-        };
+        if (!isWebGLAvailable() || typeof THREE === 'undefined') {
+            canvas.style.display = 'none';
+            fallback.style.display = 'block';
+            return;
+        }
 
-        let geometry, material, points;
+        try {
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        const generateGalaxy = () => {
-            if (points) scene.remove(points);
-            geometry = new THREE.BufferGeometry();
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.z = 4.5;
+            camera.position.y = 1.0;
+            camera.rotation.x = -0.25;
+
+            const parameters = {
+                count: 35000, size: 0.008, radius: 5, branches: 3,
+                spin: 1.2, randomness: 0.4, randomnessPower: 3,
+                insideColor: '#ffe6b3', outsideColor: '#4d7eb3'
+            };
+
+            const geometry = new THREE.BufferGeometry();
             const positions = new Float32Array(parameters.count * 3);
             const colors = new Float32Array(parameters.count * 3);
             const colorInside = new THREE.Color(parameters.insideColor);
             const colorOutside = new THREE.Color(parameters.outsideColor);
 
-            for(let i = 0; i < parameters.count; i++) {
+            for (let i = 0; i < parameters.count; i++) {
                 const i3 = i * 3;
                 const radius = Math.random() * parameters.radius;
                 const spinAngle = radius * parameters.spin;
                 const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2;
-
-                const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
-                const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
-                const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
-
-                positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
-                positions[i3 + 1] = randomY * 0.4;
-                positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
-
+                const rx = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+                const ry = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+                const rz = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+                positions[i3]     = Math.cos(branchAngle + spinAngle) * radius + rx;
+                positions[i3 + 1] = ry * 0.4;
+                positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + rz;
                 const mixedColor = colorInside.clone();
                 mixedColor.lerp(colorOutside, radius / parameters.radius);
-                colors[i3] = mixedColor.r;
-                colors[i3 + 1] = mixedColor.g;
-                colors[i3 + 2] = mixedColor.b;
+                colors[i3] = mixedColor.r; colors[i3 + 1] = mixedColor.g; colors[i3 + 2] = mixedColor.b;
             }
 
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-            material = new THREE.PointsMaterial({
-                size: parameters.size,
-                sizeAttenuation: true,
-                depthWrite: false,
-                blending: THREE.AdditiveBlending,
-                vertexColors: true
+            const material = new THREE.PointsMaterial({
+                size: parameters.size, sizeAttenuation: true,
+                depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true
             });
-
-            points = new THREE.Points(geometry, material);
+            const points = new THREE.Points(geometry, material);
             scene.add(points);
-        };
 
-        generateGalaxy();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        const clock = new THREE.Clock();
-        const animate = () => {
-            const elapsedTime = clock.getElapsedTime();
-            if (points) points.rotation.y = elapsedTime * 0.05;
-            renderer.render(scene, camera);
-            window.requestAnimationFrame(animate);
-        };
-        animate();
-
-        // --- CHAT LOGIC (Diagnóstico Híbrido - 7 perguntas) ---
-        const chatContainer = document.getElementById('chat-container');
-        const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
-        const finalCta = document.getElementById('final-cta');
-        const finalCtaBtn = document.getElementById('final-cta-btn');
-        const inputContainer = document.getElementById('input-container');
-
-        // Elementos da barra de progresso
-        const progressContainer = document.getElementById('progress-container');
-        const progressFill = document.getElementById('progress-fill');
-        const progressText = document.getElementById('progress-text');
-        const totalQuestions = 7;
-
-        let step = 0;
-        let userName = '';
-        let awaitingOption = false;
-        let optionResolver = null;
-
-        const profile = {
-            perfil: null,
-            ia: null,
-            habilidade: null,
-            informacao: null,
-            obstaculo: null,
-            aprendizado: null,
-            forca: null
-        };
-
-        function showProgressBar() {
-            if (!progressContainer.classList.contains('visible')) {
-                progressContainer.classList.add('visible');
-                progressFill.style.width = '0%';
-                progressText.textContent = '0/' + totalQuestions;
-            }
-        }
-
-        function updateProgress(currentStep) {
-            const answered = Math.min(currentStep, totalQuestions);
-            const percent = (answered / totalQuestions) * 100;
-            progressFill.style.width = percent + '%';
-            progressText.textContent = answered + '/' + totalQuestions;
-        }
-
-        function scrollToBottom() {
-            requestAnimationFrame(() => {
-                chatContainer.scrollTop = chatContainer.scrollHeight;
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
             });
-        }
 
-        function addMessage(text, role) {
-            return new Promise(resolve => {
-                const msgDiv = document.createElement('div');
-                msgDiv.classList.add('message', role);
-                msgDiv.innerHTML = text;
-                
-                chatContainer.insertBefore(msgDiv, finalCta);
-                scrollToBottom();
-                
-                const charCount = text.replace(/<[^>]*>/g, '').length;
-                const readingTime = Math.min(Math.max(charCount * 60, 1200), 4000);
-                setTimeout(resolve, readingTime);
-            });
-        }
+            const clock = new THREE.Clock();
+            const animate = () => {
+                points.rotation.y = clock.getElapsedTime() * 0.05;
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            };
+            animate();
 
-        function removeOptions() {
-            const existing = document.querySelector('.options-container');
-            if (existing) existing.remove();
+        } catch(e) {
+            console.warn('Three.js falhou:', e);
+            canvas.style.display = 'none';
+            fallback.style.display = 'block';
         }
+    })();
 
-        function showOptions(options) {
-            removeOptions();
-            const container = document.createElement('div');
-            container.className = 'options-container';
-            options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerHTML = `<span class="option-number">${index+1}</span> ${opt}`;
-                btn.addEventListener('click', () => {
-                    if (!awaitingOption) return;
-                    removeOptions();
-                    awaitingOption = false;
-                    if (optionResolver) {
-                        optionResolver({ index, text: opt });
-                        optionResolver = null;
-                    }
-                });
-                container.appendChild(btn);
-            });
-            chatContainer.insertBefore(container, finalCta);
+    // ─── 2. UTILITÁRIOS ────────────────────────────────────────────────────────
+    const chatContainer   = document.getElementById('chat-container');
+    const userInput       = document.getElementById('user-input');
+    const sendBtn         = document.getElementById('send-btn');
+    const finalCta        = document.getElementById('final-cta');
+    const finalCtaBtn     = document.getElementById('final-cta-btn');
+    const inputContainer  = document.getElementById('input-container');
+    const progressContainer = document.getElementById('progress-container');
+    const progressFill    = document.getElementById('progress-fill');
+    const progressText    = document.getElementById('progress-text');
+    const toastEl         = document.getElementById('toast');
+    const TOTAL_QUESTIONS = 7;
+
+    function showToast(msg, duration = 2500) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        setTimeout(() => toastEl.classList.remove('show'), duration);
+    }
+
+    function showProgressBar() {
+        if (!progressContainer.classList.contains('visible')) {
+            progressContainer.classList.add('visible');
+            progressFill.style.width = '0%';
+            progressText.textContent = '0/' + TOTAL_QUESTIONS;
+        }
+    }
+
+    function updateProgress(current) {
+        const pct = Math.min(current / TOTAL_QUESTIONS * 100, 100);
+        progressFill.style.width = pct + '%';
+        progressText.textContent = Math.min(current, TOTAL_QUESTIONS) + '/' + TOTAL_QUESTIONS;
+    }
+
+    function scrollToBottom() {
+        requestAnimationFrame(() => { chatContainer.scrollTop = chatContainer.scrollHeight; });
+    }
+
+    function addMessage(text, role) {
+        return new Promise(resolve => {
+            const div = document.createElement('div');
+            div.classList.add('message', role);
+            div.innerHTML = text;
+            chatContainer.insertBefore(div, finalCta);
             scrollToBottom();
-        }
-
-        function waitForOption(options) {
-            return new Promise(resolve => {
-                awaitingOption = true;
-                optionResolver = resolve;
-                showOptions(options);
-            });
-        }
-
-        function gerarDiagnostico(p) {
-            let tipo = '';
-            let pontosFortes = [];
-            let pontosAtencao = [];
-            let recomendacao = '';
-            let iaInsight = '';
-
-            if (p.perfil === 0 && p.obstaculo === 0) {
-                tipo = 'Criativo Bloqueado';
-                pontosFortes.push('Grande capacidade de ideação e criatividade');
-                pontosFortes.push('Visão ampla e pensamento divergente');
-                pontosAtencao.push('Dificuldade em transformar ideias em ações concretas');
-                pontosAtencao.push('Tendência a se dispersar com múltiplas possibilidades');
-                recomendacao = 'Você precisa de um sistema que canalize sua criatividade para execução, com priorização clara e marcos de entrega.';
-                iaInsight = 'A IA pode ser sua parceira para estruturar ideias e criar planos de ação detalhados, vencendo o bloqueio criativo.';
-            } else if (p.perfil === 1 && p.informacao <= 1) {
-                tipo = 'Estudante Sobrecarregado';
-                pontosFortes.push('Dedicação aos estudos e busca por conhecimento');
-                pontosFortes.push('Capacidade de absorver grande volume de informações');
-                pontosAtencao.push('Baixa retenção e aplicação prática do que aprende');
-                pontosAtencao.push('Sobrecarga informacional gerando paralisia');
-                recomendacao = 'Seu desafio não é aprender mais, mas sim organizar e aplicar o conhecimento. Um método de síntese e revisão é essencial.';
-                iaInsight = 'Use a IA como curadora: ela resume, organiza e destaca o essencial para você, reduzindo a sobrecarga.';
-            } else if (p.perfil === 2 && p.ia >= 2) {
-                tipo = 'Executante Disperso';
-                pontosFortes.push('Disposição para agir e realizar tarefas');
-                pontosFortes.push('Familiaridade com ferramentas de IA');
-                pontosAtencao.push('Perda de tempo com atividades repetitivas que poderiam ser automatizadas');
-                pontosAtencao.push('Falta de um fluxo de trabalho otimizado');
-                recomendacao = 'Você já usa tecnologia, mas ainda não extrai o máximo dela. Automatize processos e libere tempo para o estratégico.';
-                iaInsight = 'A IA já é sua aliada; agora dê um salto: delegue tarefas operacionais e foque na estratégia.';
-            } else if (p.habilidade === 0 && p.aprendizado === 1) {
-                tipo = 'Aprendiz Visual';
-                pontosFortes.push('Alta motivação para aprender');
-                pontosFortes.push('Preferência por formatos visuais e interativos');
-                pontosAtencao.push('Pode se frustrar com métodos tradicionais de estudo');
-                pontosAtencao.push('Necessidade de estímulos variados para manter o foco');
-                recomendacao = 'Combine mapas mentais, vídeos e prática ativa. O Nexus Manual oferece exatamente essa abordagem multimodal.';
-                iaInsight = 'A IA pode criar resumos visuais, infográficos e até quizzes para reforçar seu aprendizado.';
-            } else if (p.forca === 0 && p.obstaculo === 2) {
-                tipo = 'Estrategista com Propósito';
-                pontosFortes.push('Resiliência e determinação notáveis');
-                pontosFortes.push('Capacidade de superar adversidades');
-                pontosAtencao.push('Falta de clareza nos objetivos de longo prazo');
-                pontosAtencao.push('Risco de se esforçar muito na direção errada');
-                recomendacao = 'Defina metas claras e mensuráveis. Sua força precisa de um alvo bem definido para gerar resultados extraordinários.';
-                iaInsight = 'Com a IA, você pode simular cenários e validar decisões rapidamente, ganhando clareza de direção.';
-            } else if (p.ia === 0 && p.informacao === 0) {
-                tipo = 'Explorador Iniciante';
-                pontosFortes.push('Mente fresca e sem vícios tecnológicos');
-                pontosFortes.push('Potencial para adotar as melhores práticas desde o início');
-                pontosAtencao.push('Desconexão com as ferramentas atuais de produtividade');
-                pontosAtencao.push('Sobrecarga informacional sem filtros');
-                recomendacao = 'Comece com o básico: um sistema de gestão de informações e introdução gradual à IA como assistente pessoal.';
-                iaInsight = 'A IA pode ser sua porta de entrada para um novo mundo de produtividade, sem os vícios de quem já usa de forma errada.';
-            } else if (p.ia === 3 && p.informacao >= 2) {
-                tipo = 'Tecnologista Avançado';
-                pontosFortes.push('Uso intensivo de IA e tecnologia');
-                pontosFortes.push('Alta exposição a informações relevantes');
-                pontosAtencao.push('Risco de dependência tecnológica sem critério próprio');
-                pontosAtencao.push('Pode estar consumindo mais do que produzindo');
-                recomendacao = 'Você está na fronteira. Agora precisa de um sistema de curadoria e execução que vá além da IA, integrando sua intuição e decisão estratégica.';
-                iaInsight = 'A IA é seu copiloto, mas quem precisa estar no controle é você. Use-a como alavanca, não como bengala.';
-            } else if (p.aprendizado === 2 || p.aprendizado === 3) {
-                tipo = 'Prático Experimentador';
-                pontosFortes.push('Aprendizado focado na prática e na experiência direta');
-                pontosFortes.push('Capacidade de aprender fazendo');
-                pontosAtencao.push('Pode pular etapas importantes de fundamentação');
-                pontosAtencao.push('Necessidade de equilibrar teoria e prática');
-                recomendacao = 'Alterne entre ciclos de estudo e aplicação imediata. O método "aprender-praticar-ensinar" será seu maior aliado.';
-                iaInsight = 'A IA pode gerar protótipos e simulações para você testar ideias antes de executar de verdade.';
-            } else if (p.forca === 2 && p.habilidade === 2) {
-                tipo = 'Organizador Natural';
-                pontosFortes.push('Talento para estruturar e organizar');
-                pontosFortes.push('Busca por eficiência e ordem');
-                pontosAtencao.push('Pode se prender demais a sistemas e perder flexibilidade');
-                pontosAtencao.push('Risco de perfeccionismo paralisante');
-                recomendacao = 'Use sua habilidade organizacional para criar um sistema pessoal, mas lembre-se: a ação imperfeita supera o planejamento perfeito.';
-                iaInsight = 'Automatize a estruturação com IA e libere energia para o que realmente importa: executar.';
-            } else {
-                tipo = 'Em Transição';
-                pontosFortes.push('Autoconhecimento em desenvolvimento');
-                pontosFortes.push('Disposição para identificar áreas de melhoria');
-                pontosAtencao.push('Múltiplas frentes para trabalhar simultaneamente');
-                pontosAtencao.push('Necessidade de um plano estruturado de evolução');
-                recomendacao = 'Seu perfil indica que você está no momento certo para adotar um sistema integrado. O Nexus Manual foi desenhado para pessoas exatamente como você.';
-                iaInsight = 'A IA pode ser o acelerador que faltava para você sair da transição e entrar em evolução consistente.';
-            }
-
-            if (p.ia >= 2) pontosFortes.push('Familiaridade com IA como vantagem competitiva');
-            if (p.habilidade === 3) pontosFortes.push('Busca por clareza decisória – sinal de maturidade');
-            if (p.obstaculo === 1) pontosAtencao.push('Gestão do tempo é uma oportunidade de melhoria imediata');
-            if (p.forca === 1) pontosFortes.push('Criatividade como diferencial para inovação');
-            if (p.forca === 3) pontosFortes.push('Capacidade analítica para resolver problemas complexos');
-
-            return {
-                tipo,
-                pontosFortes: [...new Set(pontosFortes)],
-                pontosAtencao: [...new Set(pontosAtencao)],
-                recomendacao,
-                iaInsight
-            };
-        }
-
-        async function runNarrative() {
-            if (step === 1) {
-                // Saudação reformulada
-                await addMessage(
-                    `É um prazer te conhecer, <strong>${userName}</strong>.<br><br>` +
-                    `Você sabia que <strong>8 em cada 10 pessoas</strong> ainda não utilizam a inteligência artificial em todo o seu potencial?<br><br>` +
-                    `Algumas têm receio. Outras acreditam que a tecnologia é complexa. E muitas simplesmente não sabem como aplicá-la no dia a dia.<br><br>` +
-                    `Mas a verdade é que a IA pode ajudar justamente nos desafios mais comuns da rotina.<br><br>` +
-                    `Responda qual situação mais se aproxima da sua realidade:`,
-                    'assistant'
-                );
-                await new Promise(r => setTimeout(r, 800));
-
-                // Exibe a barra de progresso no início da primeira pergunta
-                showProgressBar();
-
-                const choice = await waitForOption([
-                    'Tenho muitas ideias, mas dificuldade para colocá-las em prática.',
-                    'Estudo bastante, mas esqueço grande parte do que aprendo.',
-                    'Perco tempo com tarefas repetitivas e operacionais.',
-                    'Sinto que poderia ser mais produtivo, mas não sei por onde começar com a IA.'
-                ]);
-                profile.perfil = choice.index;
-                await addMessage(choice.text, 'user');
-                updateProgress(1);
-                step = 2; runNarrative();
-            } else if (step === 2) {
-                await addMessage(`Como você se relaciona com a Inteligência Artificial hoje?`, 'assistant');
-                const choice = await waitForOption([
-                    'Nunca utilizei',
-                    'Utilizo ocasionalmente',
-                    'Utilizo frequentemente',
-                    'Utilizo todos os dias'
-                ]);
-                profile.ia = choice.index;
-                await addMessage(choice.text, 'user');
-                updateProgress(2);
-                step = 3; runNarrative();
-            } else if (step === 3) {
-                await addMessage(`Se pudesse melhorar apenas UMA habilidade, qual seria?`, 'assistant');
-                const choice = await waitForOption([
-                    'Aprender mais rápido',
-                    'Ser mais produtivo',
-                    'Organizar melhor minha rotina',
-                    'Tomar decisões melhores'
-                ]);
-                profile.habilidade = choice.index;
-                await addMessage(choice.text, 'user');
-                updateProgress(3);
-                step = 4; runNarrative();
-            } else if (step === 4) {
-                await addMessage(`Em relação ao volume de informações que você consome, como se sente?`, 'assistant');
-                const choice = await waitForOption([
-                    'Sobrecarregado, mal consigo processar',
-                    'Intenso, mas ainda dou conta',
-                    'Razoável, mas poderia aproveitar melhor',
-                    'Tranquilo, mas falta um método'
-                ]);
-                profile.informacao = choice.index;
-                await addMessage(choice.text, 'user');
-                updateProgress(4);
-                step = 5; runNarrative();
-            } else if (step === 5) {
-                await addMessage(`O que mais atrapalha seus objetivos atualmente?`, 'assistant');
-                const choice = await waitForOption([
-                    'Foco e concentração',
-                    'Gestão do tempo',
-                    'Falta de clareza nos objetivos',
-                    'Motivação inconstante'
-                ]);
-                profile.obstaculo = choice.index;
-                await addMessage(choice.text, 'user');
-                updateProgress(5);
-                step = 6; runNarrative();
-            } else if (step === 6) {
-                await addMessage(`Como você aprende melhor?`, 'assistant');
-                const choice = await waitForOption([
-                    'Lendo e fazendo anotações',
-                    'Assistindo vídeos e ouvindo explicações',
-                    'Praticando e experimentando',
-                    'Ensinando ou discutindo com outros'
-                ]);
-                profile.aprendizado = choice.index;
-                await addMessage(choice.text, 'user');
-                updateProgress(6);
-                step = 7; runNarrative();
-            } else if (step === 7) {
-                await addMessage(`Qual você considera sua maior força?`, 'assistant');
-                const choice = await waitForOption([
-                    'Resiliência e determinação',
-                    'Criatividade e inovação',
-                    'Organização e planejamento',
-                    'Análise e pensamento crítico'
-                ]);
-                profile.forca = choice.index;
-                await addMessage(choice.text, 'user');
-                updateProgress(7);
-                step = 8; runNarrative();
-            } else if (step === 8) {
-                await addMessage(`Processando seu diagnóstico personalizado...`, 'assistant');
-                await new Promise(r => setTimeout(r, 1800));
-                const diag = gerarDiagnostico(profile);
-                await addMessage(
-                    `<strong>${userName}, seu perfil é: ${diag.tipo}</strong><br><br>` +
-                    `✅ <strong>Forças:</strong><br>• ${diag.pontosFortes.join('<br>• ')}<br><br>` +
-                    `⚠️ <strong>Atenção:</strong><br>• ${diag.pontosAtencao.join('<br>• ')}`,
-                    'assistant'
-                );
-                await new Promise(r => setTimeout(r, 2500));
-                await addMessage(
-                    `<strong>Como a IA pode te ajudar:</strong><br>${diag.iaInsight}<br><br>O Nexus Manual foi criado exatamente para unir inteligência humana e artificial em um único sistema.`,
-                    'assistant'
-                );
-                step = 9; runNarrative();
-            } else if (step === 9) {
-                await addMessage(`Clique no botão abaixo e veja como dominar a IA de forma inteligente — sem medo, sem dependência, com resultado.`, 'assistant');
-                inputContainer.style.opacity = '0';
-                setTimeout(() => {
-                    inputContainer.style.display = 'none';
-                    finalCta.style.display = 'block';
-                    setTimeout(() => {
-                        chatContainer.scrollTo({
-                            top: chatContainer.scrollHeight,
-                            behavior: 'smooth'
-                        });
-                    }, 300);
-                }, 600);
-            }
-        }
-
-        async function handleSend() {
-            const text = userInput.value.trim();
-            if (!text) return;
-            userInput.value = "";
-
-            if (step === 0) {
-                const patterns = [/(?:nome é|sou o|sou a|me chamo)\s*([A-Za-zÀ-ÿ]+)/i, /^([A-Za-zÀ-ÿ]{3,})/i];
-                let nome = "";
-                for (let p of patterns) {
-                    const m = text.match(p);
-                    if (m && m[1]) {
-                        nome = m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase();
-                        break;
-                    }
-                }
-                if (!nome) {
-                    nome = text.length >= 2 ? text.charAt(0).toUpperCase() + text.slice(1).toLowerCase() : text;
-                }
-                userName = nome;
-                await addMessage(text, 'user');
-                step = 1;
-                runNarrative();
-            }
-        }
-
-        sendBtn.addEventListener('click', handleSend);
-        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
-
-        finalCtaBtn.addEventListener('click', () => {
-            const leadData = {
-                nome: userName,
-                perfil: profile.perfil,
-                ia: profile.ia,
-                habilidade: profile.habilidade,
-                informacao: profile.informacao,
-                obstaculo: profile.obstaculo,
-                aprendizado: profile.aprendizado,
-                forca: profile.forca,
-                data: new Date().toISOString()
-            };
-            localStorage.setItem('nexus_lead', JSON.stringify(leadData));
-            
-            finalCtaBtn.textContent = 'SALVANDO...';
-            finalCtaBtn.style.opacity = '0.7';
-            setTimeout(() => {
-                window.location.href = 'https://app.nexus-manual.com.br/';
-            }, 600);
+            const charCount = text.replace(/<[^>]*>/g, '').length;
+            const delay = Math.min(Math.max(charCount * 60, 1200), 4000);
+            setTimeout(resolve, delay);
         });
+    }
 
-        window.onload = async () => {
-            await new Promise(r => setTimeout(r, 800));
+    function removeOptions() {
+        const el = document.querySelector('.options-container');
+        if (el) el.remove();
+    }
+
+    // ─── 3. EXTRAÇÃO DE NOME MELHORADA ────────────────────────────────────────
+    function extractName(text) {
+        const clean = text.trim();
+
+        // Tentativas com prefixos declarativos
+        const prefixPatterns = [
+            /(?:nome é|meu nome é|sou o|sou a|me chamo|pode me chamar de)\s+([A-Za-zÀ-ÿ]+)/i,
+            /^([A-Za-zÀ-ÿ]{2,})\s+[A-Za-zÀ-ÿ]/  // "João Silva" → captura "João"
+        ];
+        for (const re of prefixPatterns) {
+            const m = clean.match(re);
+            if (m && m[1] && m[1].length >= 2) {
+                return capitalize(m[1]);
+            }
+        }
+
+        // Palavra isolada com pelo menos 2 chars
+        const words = clean.split(/\s+/).filter(w => w.length >= 2 && /^[A-Za-zÀ-ÿ]+$/.test(w));
+        if (words.length > 0) return capitalize(words[0]);
+
+        // Fallback: qualquer coisa >= 2 chars
+        return clean.length >= 2 ? capitalize(clean) : clean;
+    }
+
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    }
+
+    // ─── 4. LÓGICA DE OPÇÕES ──────────────────────────────────────────────────
+    let awaitingOption = false;
+    let optionResolver = null;
+
+    function showOptions(options) {
+        removeOptions();
+        const container = document.createElement('div');
+        container.className = 'options-container';
+        options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<span class="option-number">${i + 1}</span> ${opt}`;
+            btn.addEventListener('click', () => {
+                if (!awaitingOption) return;
+                removeOptions();
+                awaitingOption = false;
+                if (optionResolver) { optionResolver({ index: i, text: opt }); optionResolver = null; }
+            });
+            container.appendChild(btn);
+        });
+        chatContainer.insertBefore(container, finalCta);
+        scrollToBottom();
+    }
+
+    function waitForOption(options) {
+        return new Promise(resolve => {
+            awaitingOption = true;
+            optionResolver = resolve;
+            showOptions(options);
+        });
+    }
+
+    // ─── 5. DIAGNÓSTICO EXPANDIDO (cobertura total dos perfis) ────────────────
+    function gerarDiagnostico(p) {
+        // Score helper: soma todos os índices (0-3 cada) → 0-21 total
+        const totalScore = Object.values(p).reduce((acc, v) => acc + (v || 0), 0);
+
+        // Pontos extras sempre adicionados por respostas específicas
+        const extras = {
+            fortes: [],
+            atencao: []
+        };
+        if (p.ia >= 2)       extras.fortes.push('Familiaridade com IA como vantagem competitiva');
+        if (p.habilidade === 3) extras.fortes.push('Busca por clareza decisória — sinal de maturidade estratégica');
+        if (p.obstaculo === 1)  extras.atencao.push('Gestão do tempo é uma oportunidade de melhoria imediata');
+        if (p.forca === 1)   extras.fortes.push('Criatividade como diferencial para inovação');
+        if (p.forca === 3)   extras.fortes.push('Capacidade analítica para resolver problemas complexos');
+
+        // Matriz de perfis — ordem de prioridade das condições mais específicas para as mais genéricas
+        const perfis = [
+            {
+                condicao: p.ia === 3 && p.informacao >= 2,
+                tipo: 'Tecnologista Avançado',
+                fortes: ['Uso intensivo de IA e tecnologia', 'Alta exposição a informações relevantes'],
+                atencao: ['Risco de dependência tecnológica sem critério próprio', 'Pode estar consumindo mais do que produzindo'],
+                rec: 'Você está na fronteira. Agora precisa de um sistema de curadoria e execução que integre intuição e decisão estratégica.',
+                ia: 'A IA é seu copiloto — mas quem precisa estar no controle é você. Use-a como alavanca, não como bengala.'
+            },
+            {
+                condicao: p.ia === 0 && p.informacao === 0,
+                tipo: 'Explorador Iniciante',
+                fortes: ['Mente aberta e sem vícios tecnológicos', 'Potencial para adotar as melhores práticas desde o início'],
+                atencao: ['Desconexão com ferramentas de produtividade modernas', 'Sobrecarga informacional sem filtros'],
+                rec: 'Comece com o básico: um sistema de gestão de informações e introdução gradual à IA como assistente pessoal.',
+                ia: 'A IA pode ser sua porta de entrada para um novo nível de produtividade, sem os vícios de quem já usa de forma errada.'
+            },
+            {
+                condicao: p.perfil === 0 && p.obstaculo === 0,
+                tipo: 'Criativo Bloqueado',
+                fortes: ['Grande capacidade de ideação e criatividade', 'Visão ampla e pensamento divergente'],
+                atencao: ['Dificuldade em transformar ideias em ações concretas', 'Tendência a se dispersar com múltiplas possibilidades'],
+                rec: 'Você precisa de um sistema que canalize sua criatividade para a execução, com priorização clara e marcos de entrega.',
+                ia: 'A IA pode ser sua parceira para estruturar ideias e criar planos de ação detalhados, vencendo o bloqueio criativo.'
+            },
+            {
+                condicao: p.perfil === 1 && p.informacao <= 1,
+                tipo: 'Estudante Sobrecarregado',
+                fortes: ['Dedicação aos estudos e busca por conhecimento', 'Capacidade de absorver grande volume de informações'],
+                atencao: ['Baixa retenção e aplicação prática do que aprende', 'Sobrecarga informacional gerando paralisia'],
+                rec: 'Seu desafio não é aprender mais, mas organizar e aplicar o conhecimento. Um método de síntese e revisão é essencial.',
+                ia: 'Use a IA como curadora: ela resume, organiza e destaca o essencial para você, reduzindo a sobrecarga cognitiva.'
+            },
+            {
+                condicao: p.perfil === 2 && p.ia >= 2,
+                tipo: 'Executante Disperso',
+                fortes: ['Disposição para agir e realizar tarefas', 'Familiaridade com ferramentas de IA'],
+                atencao: ['Perda de tempo com atividades repetitivas que poderiam ser automatizadas', 'Falta de um fluxo de trabalho otimizado'],
+                rec: 'Você já usa tecnologia, mas ainda não extrai o máximo dela. Automatize processos e libere tempo para o estratégico.',
+                ia: 'A IA já é sua aliada; agora dê um salto: delegue tarefas operacionais e foque na estratégia e decisão.'
+            },
+            {
+                condicao: p.habilidade === 0 && p.aprendizado === 1,
+                tipo: 'Aprendiz Visual',
+                fortes: ['Alta motivação para aprender', 'Preferência por formatos visuais e interativos'],
+                atencao: ['Pode se frustrar com métodos tradicionais de estudo', 'Necessidade de estímulos variados para manter o foco'],
+                rec: 'Combine mapas mentais, vídeos e prática ativa. O Nexus Manual oferece exatamente essa abordagem multimodal.',
+                ia: 'A IA pode criar resumos visuais, infográficos e quizzes para reforçar seu aprendizado de forma dinâmica.'
+            },
+            {
+                condicao: p.forca === 0 && p.obstaculo === 2,
+                tipo: 'Estrategista com Propósito',
+                fortes: ['Resiliência e determinação notáveis', 'Capacidade de superar adversidades'],
+                atencao: ['Falta de clareza nos objetivos de longo prazo', 'Risco de se esforçar muito na direção errada'],
+                rec: 'Defina metas claras e mensuráveis. Sua força precisa de um alvo bem definido para gerar resultados extraordinários.',
+                ia: 'Com a IA, você pode simular cenários e validar decisões rapidamente, ganhando clareza de direção.'
+            },
+            {
+                condicao: p.aprendizado >= 2,
+                tipo: 'Prático Experimentador',
+                fortes: ['Aprendizado focado na prática e na experiência direta', 'Capacidade de aprender fazendo'],
+                atencao: ['Pode pular etapas importantes de fundamentação', 'Necessidade de equilibrar teoria e prática'],
+                rec: 'Alterne entre ciclos de estudo e aplicação imediata. O método "aprender-praticar-ensinar" será seu maior aliado.',
+                ia: 'A IA pode gerar protótipos e simulações para você testar ideias antes de executar de verdade.'
+            },
+            {
+                condicao: p.forca === 2 && p.habilidade === 2,
+                tipo: 'Organizador Natural',
+                fortes: ['Talento para estruturar e organizar', 'Busca por eficiência e ordem'],
+                atencao: ['Pode se prender demais a sistemas e perder flexibilidade', 'Risco de perfeccionismo paralisante'],
+                rec: 'Use sua habilidade organizacional para criar um sistema pessoal robusto — mas lembre-se: ação imperfeita supera planejamento perfeito.',
+                ia: 'Automatize a estruturação com IA e libere energia para o que realmente importa: executar e iterar.'
+            },
+            // Fallbacks por faixa de score (garantem cobertura de todos os casos restantes)
+            {
+                condicao: totalScore >= 15,
+                tipo: 'Alto Desempenho em Transição',
+                fortes: ['Alta ambição e orientação para resultados', 'Múltiplas competências desenvolvidas'],
+                atencao: ['Risco de dispersão por excesso de frentes abertas', 'Necessidade de foco e priorização'],
+                rec: 'Você tem o combustível. Agora precisa do motor certo. Um sistema integrado vai canalizar sua energia para resultados concretos.',
+                ia: 'A IA pode ser o multiplicador que faltava para transformar seu potencial em resultados consistentes.'
+            },
+            {
+                condicao: totalScore >= 8,
+                tipo: 'Potencial em Desenvolvimento',
+                fortes: ['Autoconhecimento em crescimento', 'Disposição para identificar e trabalhar pontos de melhoria'],
+                atencao: ['Múltiplas frentes para desenvolver simultaneamente', 'Necessidade de um plano estruturado de evolução'],
+                rec: 'Seu perfil indica que você está no momento certo para adotar um sistema integrado. O Nexus Manual foi desenhado para esse estágio.',
+                ia: 'A IA pode ser o acelerador que faltava para sair da fase de desenvolvimento e entrar em evolução consistente.'
+            },
+            {
+                condicao: true, // catch-all final
+                tipo: 'Iniciante com Grande Potencial',
+                fortes: ['Honestidade no autodiagnóstico — primeiro passo para evoluir', 'Base limpa para construir novos hábitos e sistemas'],
+                atencao: ['Ponto de partida distante das ferramentas modernas', 'Necessidade de estrutura e orientação claras'],
+                rec: 'Todo especialista já foi iniciante. O Nexus Manual te dá o atalho: estrutura, método e ferramentas prontas para usar.',
+                ia: 'Começar com IA hoje é como entrar no mercado com uma vantagem que levou anos para outros desenvolverem.'
+            }
+        ];
+
+        const match = perfis.find(p => p.condicao);
+
+        return {
+            tipo: match.tipo,
+            pontosFortes: [...new Set([...match.fortes, ...extras.fortes])],
+            pontosAtencao: [...new Set([...match.atencao, ...extras.atencao])],
+            recomendacao: match.rec,
+            iaInsight: match.ia
+        };
+    }
+
+    // ─── 6. ENVIO PARA BACKEND (com fallback para localStorage) ───────────────
+    async function salvarLead(leadData) {
+        const ENDPOINT = 'https://hooks.nexus-manual.com.br/lead'; // troque pela sua URL real
+
+        try {
+            const res = await fetch(ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(leadData),
+                signal: AbortSignal.timeout(5000)
+            });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            showToast('✅ Dados salvos com sucesso');
+        } catch (err) {
+            // Silenciosamente salva local como backup
+            console.warn('Endpoint indisponível, salvando localmente:', err.message);
+            localStorage.setItem('nexus_lead', JSON.stringify(leadData));
+        }
+    }
+
+    // ─── 7. NARRATIVA DO CHAT ─────────────────────────────────────────────────
+    let step = 0;
+    let userName = '';
+    const profile = { perfil: null, ia: null, habilidade: null, informacao: null, obstaculo: null, aprendizado: null, forca: null };
+
+    async function runNarrative() {
+        if (step === 1) {
             await addMessage(
-                `<strong>Bem-vindo ao Ecossistema Nexus.</strong><br><br>A Inteligência Artificial já está mudando a forma como trabalhamos, aprendemos e decidimos.<br><br>Mas a maioria das pessoas ainda não descobriu como usá-la a seu favor — e algumas até têm receio.<br><br>Este diagnóstico de 2 minutos vai revelar se você está pronto para usar a IA de forma inteligente.<br><br>Para iniciarmos me diga qual é o seu nome?`,
+                `É um prazer te conhecer, <strong>${userName}</strong>.<br><br>` +
+                `Você sabia que <strong>8 em cada 10 pessoas</strong> ainda não utilizam a inteligência artificial em todo o seu potencial?<br><br>` +
+                `Algumas têm receio. Outras acreditam que a tecnologia é complexa. E muitas simplesmente não sabem como aplicá-la no dia a dia.<br><br>` +
+                `Mas a verdade é que a IA pode ajudar justamente nos desafios mais comuns da rotina.<br><br>` +
+                `Qual situação mais se aproxima da sua realidade?`,
                 'assistant'
             );
+            showProgressBar();
+            await new Promise(r => setTimeout(r, 800));
+            const c = await waitForOption([
+                'Tenho muitas ideias, mas dificuldade para colocá-las em prática.',
+                'Estudo bastante, mas esqueço grande parte do que aprendo.',
+                'Perco tempo com tarefas repetitivas e operacionais.',
+                'Sinto que poderia ser mais produtivo, mas não sei por onde começar com a IA.'
+            ]);
+            profile.perfil = c.index;
+            await addMessage(c.text, 'user');
+            updateProgress(1);
+            step = 2; runNarrative();
+
+        } else if (step === 2) {
+            await addMessage('Como você se relaciona com a Inteligência Artificial hoje?', 'assistant');
+            const c = await waitForOption(['Nunca utilizei', 'Utilizo ocasionalmente', 'Utilizo frequentemente', 'Utilizo todos os dias']);
+            profile.ia = c.index;
+            await addMessage(c.text, 'user');
+            updateProgress(2);
+            step = 3; runNarrative();
+
+        } else if (step === 3) {
+            await addMessage('Se pudesse melhorar apenas <strong>UMA</strong> habilidade, qual seria?', 'assistant');
+            const c = await waitForOption(['Aprender mais rápido', 'Ser mais produtivo', 'Organizar melhor minha rotina', 'Tomar decisões melhores']);
+            profile.habilidade = c.index;
+            await addMessage(c.text, 'user');
+            updateProgress(3);
+            step = 4; runNarrative();
+
+        } else if (step === 4) {
+            await addMessage('Em relação ao volume de informações que você consome, como se sente?', 'assistant');
+            const c = await waitForOption([
+                'Sobrecarregado, mal consigo processar',
+                'Intenso, mas ainda dou conta',
+                'Razoável, mas poderia aproveitar melhor',
+                'Tranquilo, mas falta um método'
+            ]);
+            profile.informacao = c.index;
+            await addMessage(c.text, 'user');
+            updateProgress(4);
+            step = 5; runNarrative();
+
+        } else if (step === 5) {
+            await addMessage('O que mais atrapalha seus objetivos atualmente?', 'assistant');
+            const c = await waitForOption(['Foco e concentração', 'Gestão do tempo', 'Falta de clareza nos objetivos', 'Motivação inconstante']);
+            profile.obstaculo = c.index;
+            await addMessage(c.text, 'user');
+            updateProgress(5);
+            step = 6; runNarrative();
+
+        } else if (step === 6) {
+            await addMessage('Como você aprende melhor?', 'assistant');
+            const c = await waitForOption([
+                'Lendo e fazendo anotações',
+                'Assistindo vídeos e ouvindo explicações',
+                'Praticando e experimentando',
+                'Ensinando ou discutindo com outros'
+            ]);
+            profile.aprendizado = c.index;
+            await addMessage(c.text, 'user');
+            updateProgress(6);
+            step = 7; runNarrative();
+
+        } else if (step === 7) {
+            await addMessage('Qual você considera sua maior força?', 'assistant');
+            const c = await waitForOption([
+                'Resiliência e determinação',
+                'Criatividade e inovação',
+                'Organização e planejamento',
+                'Análise e pensamento crítico'
+            ]);
+            profile.forca = c.index;
+            await addMessage(c.text, 'user');
+            updateProgress(7);
+            step = 8; runNarrative();
+
+        } else if (step === 8) {
+            await addMessage('Processando seu diagnóstico personalizado...', 'assistant');
+            await new Promise(r => setTimeout(r, 1800));
+            const diag = gerarDiagnostico(profile);
+            await addMessage(
+                `<strong>${userName}, seu perfil é: ${diag.tipo}</strong><br><br>` +
+                `✅ <strong>Forças:</strong><br>• ${diag.pontosFortes.join('<br>• ')}<br><br>` +
+                `⚠️ <strong>Atenção:</strong><br>• ${diag.pontosAtencao.join('<br>• ')}`,
+                'assistant'
+            );
+            await new Promise(r => setTimeout(r, 2500));
+            await addMessage(
+                `<strong>Como a IA pode te ajudar:</strong><br>${diag.iaInsight}<br><br>` +
+                `O Nexus Manual foi criado exatamente para unir inteligência humana e artificial em um único sistema.`,
+                'assistant'
+            );
+            step = 9; runNarrative();
+
+        } else if (step === 9) {
+            await addMessage('Clique no botão abaixo e veja como dominar a IA de forma inteligente — sem medo, sem dependência, com resultado.', 'assistant');
+            inputContainer.style.opacity = '0';
+            setTimeout(() => {
+                inputContainer.style.display = 'none';
+                finalCta.style.display = 'block';
+                setTimeout(() => chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' }), 300);
+            }, 600);
+        }
+    }
+
+    // ─── 8. HANDLERS ──────────────────────────────────────────────────────────
+    async function handleSend() {
+        const text = userInput.value.trim();
+        if (!text) return;
+        userInput.value = '';
+
+        if (step === 0) {
+            userName = extractName(text);
+            await addMessage(text, 'user');
+            step = 1;
+            runNarrative();
+        }
+    }
+
+    sendBtn.addEventListener('click', handleSend);
+    userInput.addEventListener('keypress', e => { if (e.key === 'Enter') handleSend(); });
+
+    finalCtaBtn.addEventListener('click', async () => {
+        const leadData = {
+            nome: userName,
+            perfil: profile,
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent
         };
+
+        finalCtaBtn.textContent = 'SALVANDO...';
+        finalCtaBtn.style.opacity = '0.7';
+        finalCtaBtn.disabled = true;
+
+        await salvarLead(leadData);
+
+        setTimeout(() => {
+            window.location.href = 'https://app.nexus-manual.com.br/';
+        }, 600);
+    });
+
+    // ─── 9. INIT ──────────────────────────────────────────────────────────────
+    window.onload = async () => {
+        await new Promise(r => setTimeout(r, 800));
+        await addMessage(
+            `<strong>Bem-vindo ao Ecossistema Nexus.</strong><br><br>` +
+            `A Inteligência Artificial já está mudando a forma como trabalhamos, aprendemos e decidimos.<br><br>` +
+            `Mas a maioria das pessoas ainda não descobriu como usá-la a seu favor — e algumas até têm receio.<br><br>` +
+            `Este diagnóstico de 2 minutos vai revelar se você está pronto para usar a IA de forma inteligente.<br><br>` +
+            `Para iniciarmos, qual é o seu nome?`,
+            'assistant'
+        );
+    };
     </script>
 </body>
 </html>
