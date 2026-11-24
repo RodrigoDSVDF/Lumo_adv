@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+    <title>Ecossistema Nexus | Conversa Inteligente</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #050508;
+            --assistant-bg: rgba(18, 18, 30, 0.92);
+            --user-bg: rgba(35, 35, 60, 0.85);
+            --accent-cyan: #00D4FF;
+            --text-main: #FFFFFF;
+            --text-dim: #B0B0B0;
+            --gradient-primary: linear-gradient(90deg, #00C6FF, #0072FF);
+            --metallic-silver: linear-gradient(135deg, #f0f0f0 0%, #808080 20%, #e0e0e0 40%, #ffffff 50%, #a0a0a0 60%, #dcdcdc 80%, #f0f0f0 100%);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.7;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh; /* respeita o teclado virtual em mobile */
+            position: relative;
+        }
+        #galaxy-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: #000; }
+        #webgl-fallback {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a15 50%, #050508 100%);
+        }
+        header {
+            padding: 25px 15px;
+            text-align: center;
+            background: rgba(5, 5, 8, 0.75);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+        header h1 {
+            font-weight: 800;
+            font-size: 1.6rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: var(--metallic-silver);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0px 3px 5px rgba(0,0,0,0.6));
+            animation: silver-shine 6s linear infinite;
+            line-height: 1.2;
+            display: inline-block;
+        }
+        @keyframes silver-shine { to { background-position: 200% center; } }
+        header p { font-size: 0.7rem; color: var(--text-dim); margin-top: 6px; letter-spacing: 3px; text-transform: uppercase; opacity: 0.8; }
+        #progress-container {
+            max-width: 850px; margin: 0 auto; padding: 0 20px 10px;
+            z-index: 99; display: flex; align-items: center; gap: 12px;
+            opacity: 0; transform: translateY(-5px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        #progress-container.visible { opacity: 1; transform: translateY(0); }
+        #progress-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); white-space: nowrap; }
+        #progress-text { color: var(--accent-cyan); font-weight: 600; }
+        #progress-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; position: relative; }
+        #progress-fill {
+            height: 100%; width: 0%;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.5);
+            position: relative;
+        }
+        #progress-fill::after {
+            content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+            width: 6px; height: 6px; background: #fff; border-radius: 50%;
+            box-shadow: 0 0 8px rgba(0, 212, 255, 0.9); opacity: 0.9;
+        }
+        #chat-container {
+            flex: 1; overflow-y: auto; padding: 30px 20px;
+            max-width: 850px; margin: 0 auto; width: 100%;
+            display: flex; flex-direction: column; gap: 24px;
+            z-index: 10; scrollbar-width: none; padding-bottom: 160px;
+        }
+        #chat-container::-webkit-scrollbar { display: none; }
+        .message {
+            max-width: 85%; padding: 20px 24px; font-size: 0.95rem;
+            animation: fadeIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            word-wrap: break-word; backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            position: relative; line-height: 1.6;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .assistant { align-self: flex-start; background-color: var(--assistant-bg); border-radius: 4px 24px 24px 24px; border-left: 4px solid rgba(255,255,255,0.4); color: #f0f0f0; }
+        .user { align-self: flex-end; background-color: var(--user-bg); border-radius: 24px 24px 4px 24px; border-right: 4px solid var(--accent-cyan); color: #fff; text-align: right; }
+        .options-container {
+            display: flex; flex-direction: column; gap: 8px; margin-top: 8px;
+            animation: fadeIn 0.35s ease 0.15s both;
+            align-self: flex-start; width: 100%; max-width: 85%;
+        }
+        .option-btn {
+            background: rgba(20, 22, 38, 0.75);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 16px;
+            padding: 14px 18px; color: #ffffff; font-size: 0.9rem; font-weight: 500;
+            text-align: left; cursor: pointer; transition: all 0.25s ease;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .option-btn:active { transform: scale(0.97); background: rgba(0, 212, 255, 0.15); border-color: rgba(0, 212, 255, 0.5); box-shadow: 0 0 20px rgba(0, 212, 255, 0.2); }
+        .option-number {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 26px; height: 26px; background: var(--gradient-primary);
+            color: #fff; border-radius: 50%; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+        }
+        .input-area {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(to top, var(--bg-color) 80%, transparent);
+            padding: 20px 20px 45px 20px;
+            padding-bottom: max(45px, env(safe-area-inset-bottom, 20px));
+            z-index: 100;
+        }
+        .input-wrapper {
+            max-width: 700px; margin: 0 auto; display: flex; align-items: center; gap: 12px;
+            background: rgba(20, 20, 35, 0.98); padding: 10px 10px 10px 26px;
+            border-radius: 50px; border: 1px solid rgba(255,255,255,0.25);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.7); backdrop-filter: blur(30px);
+        }
+        input {
+            flex: 1; background: transparent; border: none; color: white;
+            padding: 12px 0; font-size: 16px; /* 16px evita zoom automático no iOS */
+            outline: none; min-width: 0;
+            -webkit-appearance: none;
+            border-radius: 0; /* remove estilo padrão iOS */
+        }
+        input::placeholder { color: rgba(255,255,255,0.35); }
+        button#send-btn {
+            background: var(--metallic-silver); border: none; color: #000;
+            height: 52px; padding: 0 32px; border-radius: 40px; font-weight: 800;
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1.5px; flex-shrink: 0;
+        }
+        button#send-btn:active { transform: scale(0.94); filter: brightness(0.9); }
+        #final-cta {
+            background: rgba(10, 10, 20, 0.98); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px; padding: 45px 30px; margin-top: 20px; margin-bottom: 20px;
+            text-align: center; display: none; backdrop-filter: blur(30px);
+            box-shadow: 0 25px 70px rgba(0,0,0,0.9); width: 100%; max-width: 100%;
+            animation: fadeIn 0.8s ease-out forwards; align-self: center;
+        }
+        .cta-title {
+            font-weight: 800; font-size: 1.6rem; margin-bottom: 12px;
+            background: var(--metallic-silver); background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; animation: silver-shine 6s linear infinite;
+        }
+        .benefits { text-align: left; margin: 25px 0; font-size: 0.95rem; list-style: none; display: inline-block; }
+        .benefits li { margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+        .nexus-btn {
+            display: block; width: 100%; padding: 22px;
+            background: var(--gradient-primary); color: white; text-decoration: none;
+            border-radius: 16px; font-weight: 800; font-size: 1.1rem; text-transform: uppercase;
+            box-shadow: 0 12px 45px rgba(0, 198, 255, 0.45); transition: all 0.4s;
+            cursor: pointer; border: none;
+        }
+        .nexus-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .nexus-btn:active { transform: translateY(0); }
+        .consent-line { display:flex; align-items:flex-start; gap:10px; text-align:left; font-size:.78rem; line-height:1.45; color:#a6aec0; margin:4px 0 18px; cursor:pointer; }
+        .consent-line input { flex:0 0 auto; appearance:auto; -webkit-appearance:checkbox; min-width:16px; width:16px; height:16px; margin-top:2px; accent-color:var(--accent-cyan); }
+        .cta-footnote { color:#969bac; margin-top:14px; font-size:.72rem; line-height:1.6; }
+        .option-btn:hover { background:rgba(0, 212, 255, .12); border-color:rgba(0, 212, 255, .4); }
+        .option-btn:focus-visible, .nexus-btn:focus-visible, #send-btn:focus-visible { outline:2px solid var(--accent-cyan); outline-offset:3px; }
+        /* Cursor piscante durante o typing */
+        .typing-cursor::after {
+            content: '▍';
+            display: inline-block;
+            opacity: 1;
+            animation: blink 0.7s step-end infinite;
+            color: var(--accent-cyan);
+            font-size: 0.85em;
+            vertical-align: baseline;
+            margin-left: 1px;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        #toast {
+            position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: rgba(0, 212, 255, 0.15); border: 1px solid rgba(0, 212, 255, 0.4);
+            color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 0.8rem;
+            letter-spacing: 1px; z-index: 200; opacity: 0;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            backdrop-filter: blur(20px); pointer-events: none;
+        }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.3rem; }
+            #chat-container { padding: 30px 18px 200px 18px; gap: 20px; }
+            .message { max-width: 90%; font-size: 0.9rem; padding: 16px 20px; }
+            .assistant { border-left-width: 3px; }
+            .user { border-right-width: 3px; }
+            button#send-btn { padding: 0 20px; font-size: 0.75rem; height: 48px; }
+            .input-area { padding: 15px 15px 30px 15px; }
+            .input-wrapper { padding-left: 20px; }
+            .option-btn { padding: 12px 14px; font-size: 0.8rem; }
+            #final-cta { padding: 35px 20px; margin-top: 10px; }
+            #progress-container { padding: 0 18px 8px; gap: 8px; }
+            #progress-label { font-size: 0.65rem; }
+        }
+        @media (max-width: 400px) {
+            #chat-container { padding: 20px 12px 180px 12px; }
+            .input-area { padding: 10px 10px 25px 10px; }
+            .input-wrapper { padding-left: 16px; gap: 8px; }
+            button#send-btn { padding: 0 16px; font-size: 0.7rem; height: 44px; }
+            input { font-size: 16px; } /* mantém 16px para evitar zoom no iOS */
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .message, .options-container { animation: none; }
+            #progress-fill { transition: none; }
+            .typing-cursor::after { animation: none; }
+        }
+    
+        .chat-subheader {display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%; max-width:850px;margin:auto;padding:8px 20px 7px;color:#a5afc9;font-size:.72rem;letter-spacing:.1px;}
+        .chat-subheader .state-dot {display:inline-block;width:7px;height:7px;margin-right:6px;border-radius:50%;background:#00c5f7;box-shadow:0 0 10px rgba(0,205,255,.6);}
+        .restart {background:transparent; color:#b8c7d8;border:1px solid rgba(255,255,255,.2); border-radius:20px;padding:6px 10px;cursor:pointer;font:inherit;}
+        .restart:hover,.restart:focus-visible {border-color:#00D4FF;color:white;}
+        .input-area {padding-bottom:max(22px,env(safe-area-inset-bottom,16px));}
+        #chat-container {padding-top:18px;padding-bottom:185px;}
+        .message {overflow-wrap:anywhere;}
+        .nexus-btn {display:block;text-align:center;}
+        .tip-text {font-size:.72rem;color:#9eaac0;text-align:center;margin:12px auto 0;max-width:650px;}
+        .input-wrapper:focus-within {border-color:rgba(0,212,255,.65);box-shadow:0 12px 40px rgba(0,0,0,.5),0 0 0 2px rgba(0,212,255,.12);}
+        #chat-container:focus {outline:none;}
+        .sr-only {position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;}
+        @media (max-width:600px) { .chat-subheader{padding:7px 17px;font-size:.68rem;} .tip-text{font-size:.67rem;} #chat-container {padding-bottom:210px;}}
+        @media (prefers-reduced-motion: reduce) {.typing-cursor:after{animation:none;display:none;}}
+
+    </style>
+</head>
+<body>
+  <canvas id="galaxy-bg" aria-hidden="true"></canvas>
+  <div id="webgl-fallback" aria-hidden="true"></div>
+  <header>
+    <h1>Ecossistema Nexus</h1>
+    <p>Conexões inteligentes • Ferramentas úteis • Novas possibilidades</p>
+  </header>
+  <div class="chat-subheader">
+    <span><span class="state-dot"></span><span id="chat-status">Assistente virtual • conversa contextual</span></span>
+    <button class="restart" id="restart-btn" type="button">↻ Recomeçar</button>
+  </div>
+  <main id="chat-container" role="log" aria-label="Conversa com o assistente Nexus" aria-live="polite" aria-relevant="additions">
+    <section id="final-cta" aria-label="Acessar o Hub Nexus">
+      <div class="cta-title">EXPLORE O UNIVERSO NEXUS ✨</div>
+      <p style="color:#c4c8d6;font-size:.95rem;">Uma central de ferramentas para descobrir o que faz sentido para seus objetivos.</p>
+      <ul class="benefits">
+        <li><span>✦</span> Ferramentas digitais e recursos de IA</li>
+        <li><span>✦</span> Apoio para estudar, criar e organizar</li>
+        <li><span>✦</span> Explore com autonomia e no seu ritmo</li>
+      </ul>
+      <a class="nexus-btn" id="final-cta-btn" href="https://app.nexus-manual.com.br/" target="_blank" rel="noopener noreferrer">CONHECER O HUB NEXUS ↗</a>
+      <p class="cta-footnote">Você será direcionado ao site do Nexus. Verifique lá as condições de acesso. O chat continua disponível.</p>
+    </section>
+  </main>
+  <footer class="input-area" id="input-container">
+    <div class="input-wrapper">
+      <label class="sr-only" for="user-input">Sua mensagem</label>
+      <input type="text" id="user-input" placeholder="Escreva o que você pensa..." autocomplete="off" maxlength="600" aria-describedby="chat-hint">
+      <button id="send-btn" type="button">ENVIAR</button>
+    </div>
+    <p class="tip-text" id="chat-hint">Conversa por texto livre, sem respostas de múltipla escolha. Diga “link” a qualquer momento para conhecer o hub.</p>
+  </footer>
+  <script>
+    // ─── 1. THREE.JS COM FALLBACK PARA WEBGL ───────────────────────────────────
+    (function() {
+        const canvas = document.getElementById('galaxy-bg');
+        const fallback = document.getElementById('webgl-fallback');
+
+        function isWebGLAvailable() {
+            try {
+                const testCanvas = document.createElement('canvas');
+                return !!(
+                    window.WebGLRenderingContext &&
+                    (testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl'))
+                );
+            } catch(e) {
+                return false;
+            }
+        }
+
+        if (!isWebGLAvailable() || typeof THREE === 'undefined') {
+            canvas.style.display = 'none';
+            fallback.style.display = 'block';
+            return;
+        }
+
+        try {
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.z = 4.5;
+            camera.position.y = 1.0;
+            camera.rotation.x = -0.25;
+
+            const parameters = {
+                count: window.innerWidth < 700 ? 9000 : 22000, size: 0.008, radius: 5, branches: 3,
+                spin: 1.2, randomness: 0.4, randomnessPower: 3,
+                insideColor: '#ffe6b3', outsideColor: '#4d7eb3'
+            };
+
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(parameters.count * 3);
+            const colors = new Float32Array(parameters.count * 3);
+            const colorInside = new THREE.Color(parameters.insideColor);
+            const colorOutside = new THREE.Color(parameters.outsideColor);
+
+            for (let i = 0; i < parameters.count; i++) {
+                const i3 = i * 3;
+                const radius = Math.random() * parameters.radius;
+                const spinAngle = radius * parameters.spin;
+                const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2;
+                const rx = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+                const ry = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+                const rz = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+                positions[i3]     = Math.cos(branchAngle + spinAngle) * radius + rx;
+                positions[i3 + 1] = ry * 0.4;
+                positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + rz;
+                const mixedColor = colorInside.clone();
+                mixedColor.lerp(colorOutside, radius / parameters.radius);
+                colors[i3] = mixedColor.r; colors[i3 + 1] = mixedColor.g; colors[i3 + 2] = mixedColor.b;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            const material = new THREE.PointsMaterial({
+                size: parameters.size, sizeAttenuation: true,
+                depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true
+            });
+            const points = new THREE.Points(geometry, material);
+            scene.add(points);
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            const clock = new THREE.Clock();
+            const animate = () => {
+                points.rotation.y = clock.getElapsedTime() * 0.05;
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            };
+            animate();
+
+        } catch(e) {
+            console.warn('Three.js falhou:', e);
+            canvas.style.display = 'none';
+            fallback.style.display = 'block';
+        }
+    })();
+
+
+'use strict';
+
+/*
+ * NEXUS — Conversação contextual com texto livre.
+ * Funciona diretamente no GitHub Pages, sem API ou chaves externas.
+ * É um motor local de interpretação por regras, não um modelo generativo.
+ * Para IA generativa real, conecte um backend seguro em AI_API_URL.
+ */
+const HUB_URL = 'https://app.nexus-manual.com.br/';
+const AI_API_URL = ''; // EXEMPLO: 'https://seu-backend.com/api/nexus-chat' (nunca uma chave de API aqui)
+
+const dom = {
+  chat: document.getElementById('chat-container'),
+  input: document.getElementById('user-input'),
+  send: document.getElementById('send-btn'),
+  card: document.getElementById('final-cta'),
+  hub: document.getElementById('final-cta-btn'),
+  status: document.getElementById('chat-status'),
+  hint: document.getElementById('chat-hint'),
+  reset: document.getElementById('restart-btn')
+};
+
+const state = {
+  stage: 'mood',
+  name: '', mood: '', tech: 'unknown', overload: 'unknown',
+  goal: 'geral', goalText: '', experience: '',
+  attempts: { name: 0, goal: 0, offer: 0, unknown: 0 },
+  diagnostic: [], diagnosticIndex: 0,
+  lastTopic: '', linkShown: false,
+  messages: [], busy: false
+};
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+function scrollDown() { requestAnimationFrame(() => { dom.chat.scrollTop = dom.chat.scrollHeight; }); }
+function clean(str) {
+  return String(str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function has(t, pattern) { return pattern.test(t); }
+function firstName(raw) {
+  const str = String(raw).trim().replace(/[.!?]+$/g,'');
+  const explicit = str.match(/^(?:meu nome [eé]|me chamo|pode me chamar de|sou o|sou a)\s+([A-Za-zÀ-ÿ]{2,})/i);
+  if (explicit) return explicit[1].slice(0,1).toUpperCase() + explicit[1].slice(1).toLowerCase();
+  const words = str.split(/\s+/);
+  if (!words.length || words.length > 3 || !words.every(w => /^[A-Za-zÀ-ÿ]{2,}$/.test(w))) return null;
+  const forbidden = /^(nao|sim|claro|prefiro|sou|quero|pode|ola|opa|bem|legal|gosto|nada|deixa|ninguem|obrigado|dispenso|tanto|assim|sei|meu|boa|uso|curto|adoro|amo|gostei|preciso|trabalho|gostaria|tenho|ia|aqui|isso|ta|estou|hoje|voce|vc|ok)$/i;
+  if (words.some(w=>forbidden.test(w))) return null;
+  if (words.length > 1 && words.some(w => /^(todo|dia|muito|mais|tempo|tecnologia|inteligencia|artificial|sozinho|privado)$/i.test(w))) return null;
+  const result = words[0];
+  return result.slice(0,1).toUpperCase() + result.slice(1).toLowerCase();
+}
+const person = () => state.name ? `, ${state.name}` : '';
+const nameOr = () => state.name || 'você';
+const shortNo = t => /^(nao|n|negativo|nem tanto|na verdade nao|nao muito|nem um pouco|claro que nao|nunca)$/i.test(t);
+const shortYes = t => /^(sim|s|claro|com certeza|pode|pode sim|beleza|ok|bora|quero|quero sim|combinado|manda|pode mandar|logico|logico que sim|vamos|isso|exato|exatamente|tenho sim|gostei|top|show|bastante|demais)$/i.test(t);
+const uncertain = t => /^(talvez|mais ou menos|depende|nao sei|sei la|nao tenho certeza|pode ser|acho que sim|acho que nao|tanto faz|mais ou menos isso)$/i.test(t);
+const skipName = t => /\b(prefiro nao|sem nome|anonimo|nome privado|manter meu nome privado|nao quero dar meu nome|nao quero (dizer|falar|informar)|pula|pular|proximo|tanto faz|nao importa|nao precisa|nao vou falar)\b/i.test(t);
+const stopAll = t => /\b(para de (falar|mandar)|pare (de falar|com isso)|me deixa em paz|nao quero mais conversar|encerra|encerrar|sair da conversa|tchau|adeus|desisto|chega de perguntas|nao me incomode|nunca mais|nao tenho interesse (nisso|no nexus|na plataforma|nesse assunto)|nao estou interessad[oa])\b/.test(t);
+const getLink = t => /\b(link|url|endereco do site|abrir (o )?(site|hub|nexus)|acessar (o )?(site|hub|nexus)|me leva (pro|para o) site|me manda (o )?(site|acesso)|manda (o )?(link|site)|quero entrar|ir pro site|visitar o site)\b/.test(t);
+const wantsDiagnostic = t => /\b(diagnostico|meu perfil|analise (meu|o meu) perfil|avaliar meu perfil|teste de perfil|me avaliar|me conhecer melhor|avaliacao personalizada)\b/.test(t);
+const declineCommercial = t => /\b(nao quero (comprar|pagar|assinar)|sem dinheiro|nao tenho dinheiro|nao vou pagar|nao pago|ta caro|muito caro|custa caro|nao confio|golpe|fraude|suspeito|enganacao|desconfiad)\b/.test(t);
+const explicitNoInterest = t => /\b(nao tenho interesse|sem interesse|nao me interessa|nao quero conhecer|nao quero saber|nao preciso (disso|de um hub|de ferramenta|de nada)|nao quero nada|nao tenho tempo pra isso)\b/.test(t);
+const dislikeTech = t => /\b(nao gosto|nao curto|odeio|detesto|nao me interesso|nao tenho interesse)\b.*\b(tecnologia|ia|inteligencia artificial|computador|aplicativo)/.test(t);
+const isLowMood = t => /\b(mal|ruim|pessim[oa]|triste|cansad[oa]|estressad[oa]|exaust[oa]|ansios[oa]|preocupad[oa]|dificil|complicado|nao estou bem|mais ou menos|correria|pesado|pessimo|horrivel)\b/.test(t);
+const isGoodMood = t => /\b(bem|otim[oa]|excelente|maravilh[ao]|feliz|tranquil[oa]|de boa|show|top|tudo certo|legal|animad[oa]|bacana|tudo bem|muito bem)\b/.test(t);
+
+const GOALS = [
+  { id:'estudos', rx:/\b(estud|prova|concurso|aprender|educac|faculdade|escola|enem|questoes|revisao|apostila|idioma|aula)/, title:'estudar e aprender', idea:'comparar ferramentas para criar resumos, organizar revisões e praticar conteúdos' },
+  { id:'documentos', rx:/\b(document|pdf|arquivo|edital|contrato|planilh|word|excel|curriculo|relatorio)/, title:'trabalhar com documentos', idea:'explorar recursos para extrair informações de documentos e organizar arquivos' },
+  { id:'programacao', rx:/\b(program|codigo|site|html|css|javascript|python|app|aplicativo|desenvolv|software|web|github)/, title:'criar projetos digitais', idea:'encontrar assistentes para estruturar ideias, revisar código e prototipar projetos' },
+  { id:'negocios', rx:/\b(vend|venda|empreend|negoci|empresa|cliente|marketing|renda|ganhar dinheiro|produto digital|anunci|loja|divulg)/, title:'desenvolver projetos e negócios', idea:'buscar apoio para planejar conteúdo, organizar processos e testar ideias de produto' },
+  { id:'criacao', rx:/\b(imagem|foto|video|design|arte|criativ|conteudo|post|texto|escrever|roteiro|edicao|musica)/, title:'criar conteúdo', idea:'experimentar ferramentas de escrita, criação visual e organização de conteúdo' },
+  { id:'financas', rx:/\b(financ|invest|dinheiro|orcament|gasto|despesa|receita|contas|controle de gastos|dashboard|dados|indicador)/, title:'organizar números e informações', idea:'explorar recursos para analisar dados, visualizar informações e planejar rotinas financeiras' },
+  { id:'produtividade', rx:/\b(tempo|produtiv|organiza|rotina|taref|automat|trabalho|emprego|agenda|planej|foco|processo|repetitiv|gestao)/, title:'ganhar organização e produtividade', idea:'encontrar ferramentas para estruturar tarefas, planejar rotinas e reduzir trabalhos manuais' },
+  { id:'ia', rx:/\b(chatgpt|gemini|claude|copilot|inteligencia artificial|ferramentas de ia|modelos de ia|prompts?)/, title:'explorar inteligência artificial', idea:'conhecer diferentes recursos e descobrir o que vale testar para suas necessidades' }
+];
+function detectGoal(t) {
+  let best = {id:'geral', title:'explorar possibilidades', idea:'descobrir ferramentas úteis para um objetivo concreto', score:0};
+  for (const item of GOALS) {
+    const match = t.match(new RegExp(item.rx.source, 'g'));
+    let score = (match || []).length;
+    if (item.id === 'negocios' && /\b(meu negocio|minha empresa|clientes?|vender|vendas)\b/.test(t)) score += 0.6;
+    if (score > best.score) best = {...item, score};
+  }
+  return best;
+}
+function goalDetails() { return GOALS.find(g => g.id === state.goal) || { title:'explorar possibilidades', idea:'encontrar ferramentas que façam sentido para sua rotina' }; }
+function moodReaction(t) {
+  if (isLowMood(t)) return 'Poxa, espero que as coisas fiquem um pouco mais leves por aí. 💙 Sem pressão: a gente pode conversar no seu ritmo.';
+  if (isGoodMood(t)) return 'Boa! 😄 Gosto desse clima. Vamos trocar uma ideia?';
+  return 'Entendi. Valeu por compartilhar! 😄 Podemos ir conversando tranquilamente.';
+}
+function understandTech(t) {
+  if (dislikeTech(t) || (/\b(nunca|nao|nem)\b/.test(t) && /\b(curto|gosto|interesse)\b/.test(t))) return 'nao';
+  if (/\b(amo|adoro|apaixonad|curto (muito|demais)|gosto muito|sou da area|trabalho com|uso todo dia|programador|desenvolvedor|ja uso|sempre testo|gosto de tecnologia|gosto de ia|gosto sim|curto sim|curto tecnologia|uso ia todo dia|uso chatgpt)\b/.test(t)) return 'sim';
+  if (shortNo(t)) return 'nao';
+  if (shortYes(t)) return 'sim';
+  if (/\b(curios|conhecer|explor|novidade|saber mais|mais ou menos|so olhando|so vendo|dando uma olhada)\b/.test(t) || uncertain(t)) return 'talvez';
+  return 'talvez';
+}
+function understandOverload(t) {
+  if (shortNo(t) || /\b(nao fico perdid|nao sinto dificuldade|sei o que quero|sei onde encontrar|dou conta|ja tenho as minhas|nao me atrapalha|nao e problema)\b/.test(t)) return 'nao';
+  if ((/^sim\b/.test(t) && !/\b(mas|nao)\b/.test(t)) || shortYes(t) || /\b(perdid|confus|excesso|muitas? opcoes|muitas? ferramentas?|complicad|nao sei (qual|por onde)|sobrecarreg|dificuldade|muita ferramenta|demais|infinidade|saturad)\b/.test(t)) return 'sim';
+  return 'talvez';
+}
+function lightweightExperience(t) {
+  if (/\b(nunca usei|nao uso|sou iniciante|nao conheco|primeira vez|nao tenho experiencia)\b/.test(t)) return 'iniciante';
+  if (/\b(uso sempre|uso todo dia|diariamente|sou avancad|trabalho com ia|sou programador|ja domino|experiente|conheco bem)\b/.test(t)) return 'experiente';
+  if (/\b(as vezes|ocasional|uso um pouco|ja testei|ja experimentei)\b/.test(t)) return 'intermediario';
+  return '';
+}
+function faqType(t) {
+  if (/\b(quem e voce|voce e (?:(?:um|uma) )?(robo|bot|ia|humano|pessoa)|e uma ia de verdade|voce e real|quem ta falando)\b/.test(t)) return 'identity';
+  if (/\b(privacidade|dados pessoais|meus dados|armazen|grava (a|essa) conversa|salv|enviad[oa]s|lgpd|seguranca dos dados)\b/.test(t)) return 'privacy';
+  if (/\b(quanto custa|qual (o )?preco|valor|e pago|precisa pagar|mensalidade|assinatura|gratuito|de graca|cobranca)\b/.test(t)) return 'price';
+  if (/\b(golpe|fraude|confiav|segur[oa]|suspeit|enganac|legitim[oa]|garantia|verdade mesmo)\b/.test(t)) return 'trust';
+  if (/\b(google|pesquisar sozinho|chatgpt ja faz|ja tenho chatgpt|ja uso outras ias|por que eu usaria|qual a diferenca|diferencial|vantagem)\b/.test(t)) return 'difference';
+  if (/\b(o que e (o )?(nexus|hub)|como funciona|que ferramentas|quais ferramentas|o que tem la|serve pra que|para que serve|me explica|explica melhor|quero entender|mais detalhes)\b/.test(t)) return 'product';
+  if (/\b(preciso criar conta|tem cadastro|login|precisa de conta|requisitos|funciona no celular|funciona no pc|funciona no computador)\b/.test(t)) return 'access';
+  if (/\b(e pra iniciante|nao entendo de tecnologia|nao sou da area|sou leigo|nao sei mexer|sou velho pra isso)\b/.test(t)) return 'beginner';
+  if (/\b(sem tempo|nao tenho tempo|to ocupado|muita correria|falta tempo)\b/.test(t)) return 'time';
+  if (/\b(nao quero pagar|nao quero comprar|sem dinheiro|ta caro|nao tenho dinheiro|nao vou assinar)\b/.test(t)) return 'costObjection';
+  return '';
+}
+function faqAnswer(type) {
+  switch(type) {
+    case 'identity': return 'Sou o assistente virtual do Nexus. Nesta versão, interpreto o que você escreve usando regras contextuais; não sou uma pessoa. Para respostas abertas de uma IA generativa, o site precisa estar conectado a um modelo por um servidor.';
+    case 'privacy': return AI_API_URL ? 'A versão conectada pode enviar sua mensagem ao servidor de IA para elaborar uma resposta. Evite incluir dados sensíveis e confira a política de privacidade antes de continuar.' : 'Nesta versão, suas respostas são usadas nesta conversa, no próprio navegador, sem cadastro nem envio do conteúdo para um serviço de IA. O site ainda pode carregar recursos visuais externos.';
+    case 'price': return 'Boa pergunta. Não vou inventar preço nem dizer que tudo é gratuito: valores, eventuais assinaturas e condições de acesso precisam ser conferidos no site do Nexus. Conhecer a apresentação não te obriga a comprar.';
+    case 'trust': return 'Você faz bem em verificar antes de confiar. Confira o endereço de destino, as condições de acesso e a política de privacidade. Eu não preciso de senha, CPF nem dados de pagamento para conversar com você.';
+    case 'difference': return 'Faz sentido: Google e ChatGPT já resolvem muita coisa. A proposta do Nexus não é substituir os dois, mas reunir caminhos e recursos em uma central. Se você já tem seu fluxo bem resolvido, talvez não precise — e tudo bem.';
+    case 'product': return 'O Nexus é um hub que organiza recursos digitais ligados a IA, aprendizado, criação e produtividade em um só lugar. Você navega pelas opções e escolhe o que faz sentido para seu objetivo. O catálogo exato é mostrado no próprio site.';
+    case 'access': return 'Você pode conhecer a página pelo navegador, inclusive no celular. Se algum recurso exige conta, instalação ou pagamento, isso deve ser confirmado no destino.';
+    case 'beginner': return 'Não precisa ser especialista. A ideia é começar por uma tarefa simples, descobrir um recurso útil e aprender no seu ritmo — sem tentar usar todas as ferramentas de uma vez.';
+    case 'time': return 'Justamente por isso eu tentaria começar com algo pequeno: uma tarefa repetitiva que valha a pena simplificar. E, se agora não for um bom momento, sem problema.';
+    case 'costObjection': return 'Entendo. Não precisa assumir compromisso. Você pode verificar primeiro as condições de acesso no site e decidir se vale a pena para você.';
+    default: return '';
+  }
+}
+function relevantQuestion() {
+  switch(state.stage) {
+    case 'mood': return 'Como você está hoje?';
+    case 'name': return 'Como posso te chamar? Pode responder “prefiro não dizer”.';
+    case 'technology': return 'Você curte tecnologia ou está só explorando?';
+    case 'overload': return 'Às vezes é difícil escolher entre tantas ferramentas, ou isso não te atrapalha?';
+    case 'goal': return 'Qual tarefa ou objetivo você gostaria de facilitar hoje?';
+    case 'offer': return 'Quer que eu te mostre onde explorar o hub?';
+    case 'diagnostic': return diagnosticQuestions[state.diagnosticIndex] || 'Quer continuar?';
+    case 'access': return 'Se quiser, me conte uma tarefa concreta e eu sugiro por onde começar.';
+    default: return '';
+  }
+}
+
+const diagnosticQuestions = [
+  'Vamos fazer uma leitura rápida, sem respostas prontas. Qual é a principal coisa que você gostaria de melhorar no seu dia a dia?',
+  'O que mais te atrapalha a avançar nisso hoje?',
+  'Você já usa IA para lidar com esse desafio? Me conta como tem sido.',
+  'Quando precisa aprender algo novo, o que costuma funcionar melhor para você?',
+  'E qual habilidade sua costuma ajudar quando surge um problema?',
+  'Se pudesse resolver uma pequena parte disso ainda esta semana, qual seria?'
+];
+
+async function renderMessage(text, role) {
+  const el = document.createElement('article');
+  el.className = `message ${role}`;
+  el.setAttribute('aria-label', role === 'user' ? 'Você' : 'Assistente Nexus');
+  el.style.whiteSpace = 'pre-wrap';
+  dom.chat.insertBefore(el, dom.card);
+  state.messages.push({role, text});
+  if (state.messages.length > 30) state.messages.shift();
+  scrollDown();
+  if (role === 'user' || reducedMotion) {
+    el.textContent = text;
+  } else {
+    await wait(180);
+    el.classList.add('typing-cursor');
+    const speed = 8;
+    const chunk = Math.max(1, Math.ceil(text.length / 130));
+    for (let i = 0; i < text.length; i += chunk) {
+      el.textContent = text.slice(0, i + chunk);
+      scrollDown();
+      await wait(speed);
+    }
+    el.textContent = text;
+    el.classList.remove('typing-cursor');
+  }
+  scrollDown();
+}
+function showAccess() {
+  state.stage = 'access';
+  state.linkShown = true;
+  dom.card.style.display = 'block';
+  if (AI_API_URL) dom.hint.textContent = 'Conversa digitada com IA conectada a um servidor. Evite dados sensíveis; leia a política de privacidade do site.';
+  dom.hub.href = HUB_URL;
+  dom.hub.target = '_blank';
+  dom.hub.rel = 'noopener noreferrer';
+  scrollDown();
+}
+async function endConversation() {
+  state.stage = 'closed';
+  dom.card.style.display = 'none';
+  return 'Tudo bem, respeito sua decisão. Obrigado pela conversa! Se algum dia quiser conhecer o hub, basta digitar “link”. 🙂';
+}
+async function beginDiagnostic() {
+  state.stage = 'diagnostic';
+  state.diagnostic = [];
+  state.diagnosticIndex = 0;
+  return diagnosticQuestions[0] + '\n\nSe quiser parar a qualquer momento, é só escrever “parar diagnóstico”.';
+}
+function diagnosticSummary() {
+  const combined = clean(state.diagnostic.join(' '));
+  const detected = detectGoal(combined);
+  const topic = (detected.id !== 'geral' ? detected : goalDetails());
+  const obstacle = state.diagnostic[1] ? state.diagnostic[1].trim().slice(0, 130) : 'definir prioridades';
+  const firstStep = state.diagnostic[5] ? state.diagnostic[5].trim().slice(0, 130) : 'escolher uma tarefa simples para começar';
+  return `Fechamos, ${nameOr()}! 👏\n\nPelas suas respostas, seu foco parece estar em ${topic.title}. Você citou como desafio: “${obstacle}”.\n\nMinha sugestão inicial: comece por “${firstStep}” e teste ${topic.idea}. É uma orientação prática com base no que você me contou, não um teste psicológico.\n\nQuer conhecer a central Nexus e procurar ferramentas para isso? Se sim, é só digitar “link”.`;
+}
+
+async function localReply(raw) {
+  const t = clean(raw);
+  const stage = state.stage;
+  // Pedidos explícitos do visitante prevalecem sobre qualquer roteiro.
+  if (t === 'reiniciar' || t === 'recomecar' || t === 'comecar de novo') {
+    resetConversation(false);
+    return 'Combinado, vamos recomeçar. 😄 Como está seu dia?';
+  }
+  if (t === 'parar diagnostico' && stage === 'diagnostic') {
+    state.stage = 'offer';
+    return 'Claro, vamos deixar o diagnóstico por aqui. Sem problema nenhum. Quer conhecer o hub ou prefere encerrar?';
+  }
+  if (stopAll(t) || (explicitNoInterest(t) && !['mood','name','technology','overload'].includes(stage))) return endConversation();
+  if (getLink(t)) {
+    showAccess();
+    return 'Claro! Aqui está o acesso ao Hub Nexus. 🔗\n\nVocê pode abrir pelo cartão abaixo e explorar com calma, sem obrigação de contratar nada. Se surgir uma dúvida, pode continuar digitando aqui.';
+  }
+  if (wantsDiagnostic(t) && stage !== 'diagnostic') return beginDiagnostic();
+  // O visitante pode fazer perguntas ou levantar objeções em qualquer ponto.
+  const faqDetected = faqType(t);
+  const faq = stage === 'diagnostic' && !raw.includes('?') && ['time','beginner','costObjection'].includes(faqDetected) ? '' : faqDetected;
+  if (faq) {
+    state.lastTopic = faq;
+    const answer = faqAnswer(faq);
+    if (stage === 'closed') return answer + '\n\nNão vou insistir na apresentação. Se quiser retomar, escreva “recomeçar”.';
+    if (stage === 'access') return answer + '\n\nO link continua disponível acima. Quer conversar sobre algum uso específico?';
+    return answer + '\n\n' + relevantQuestion();
+  }
+  // Na conversa de diagnóstico, cada frase é realmente lida como texto livre.
+  if (stage === 'diagnostic') {
+    if (t === 'pular' || t === 'nao sei' || t === 'prefiro nao responder') state.diagnostic.push('Não informado');
+    else state.diagnostic.push(raw.trim());
+    state.diagnosticIndex += 1;
+    if (state.diagnosticIndex >= diagnosticQuestions.length) {
+      state.stage = 'offer';
+      const found = detectGoal(clean(state.diagnostic.join(' ')));
+      if (found.id !== 'geral') state.goal = found.id;
+      return diagnosticSummary();
+    }
+    const reactions = [
+      'Boa, já entendi melhor o que importa para você.',
+      'Entendi. Isso ajuda a identificar onde vale investir esforço.',
+      'Faz sentido. O ideal é aproveitar o que já funciona e ajustar o resto.',
+      'Interessante! Não existe só uma maneira certa de aprender.',
+      'Essa é uma força importante para construir um caminho prático.'
+    ];
+    return (reactions[Math.min(state.diagnosticIndex - 1, reactions.length - 1)] || 'Certo.') + '\n\n' + diagnosticQuestions[state.diagnosticIndex];
+  }
+  if (stage === 'closed') {
+    if (t === 'oi' || t === 'ola' || /\b(continuar|voltar|conversar|recomecar)\b/.test(t)) {
+      state.stage = 'technology';
+      return 'Podemos conversar, sim. 😄 Você costuma usar tecnologia no dia a dia?';
+    }
+    return 'Pode falar! Só não vou insistir na apresentação. Se quiser conhecer o hub mais tarde, escreva “link”.';
+  }
+  if (stage === 'mood') {
+    state.mood = raw.trim().slice(0,150);
+    state.stage = 'name';
+    return moodReaction(t) + '\n\nAliás, como posso te chamar? Se preferir, podemos conversar sem nome também.';
+  }
+  if (stage === 'name') {
+    if (skipName(t) || shortNo(t)) {
+      state.name = '';
+      state.stage = 'technology';
+      return 'Tranquilo, sem necessidade de informar seu nome. 🙂\n\nMe conta uma coisa: você curte tecnologia ou está só explorando por curiosidade?';
+    }
+    // Se a pessoa responder sobre tecnologia em vez de informar um nome,
+    // não tente transformar a primeira palavra em um nome próprio.
+    const impliedTech = lightweightExperience(t);
+    if (!firstName(raw) && (impliedTech || /\b(adoro tecnologia|uso ia|uso chatgpt|sou programador|nao gosto de tecnologia)\b/.test(t))) {
+      state.stage = 'overload';
+      state.tech = understandTech(t);
+      state.experience = impliedTech;
+      return 'Boa! Não precisamos do nome para continuar. 😄\n\nCom tantas ferramentas novas aparecendo, às vezes você sente dificuldade para escolher a mais útil?';
+    }
+    const name = firstName(raw);
+    if (!name && state.attempts.name === 0) {
+      state.attempts.name += 1;
+      return 'Posso te chamar como você preferir. Se quiser, diga só seu primeiro nome; ou escreva “prefiro não dizer”.';
+    }
+    state.name = name || '';
+    state.stage = 'technology';
+    return `Prazer${state.name ? `, ${state.name}` : ''}! 😄 Eu sou o assistente virtual do Nexus.\n\nJá que apareceu por aqui, fiquei curioso: você gosta de tecnologia ou veio mais para conhecer?`;
+  }
+  if (stage === 'technology') {
+    if (explicitNoInterest(t) && !dislikeTech(t)) return endConversation();
+    state.tech = understandTech(t);
+    state.experience = lightweightExperience(t);
+    state.stage = state.tech === 'nao' ? 'goal' : 'overload';
+    if (state.tech === 'sim') return 'Aí sim! 🚀 Então você já deve ter visto quantas ferramentas novas aparecem toda semana.\n\nCom tantas opções, às vezes é difícil saber qual realmente vale a pena usar?';
+    if (state.tech === 'nao') return 'Justo! Nem todo mundo precisa amar tecnologia. O que importa é ela facilitar a vida, não complicar.\n\nSe pudesse resolver alguma tarefa chata ou demorada hoje, qual seria?';
+    return 'Legal! Curiosidade já é um bom começo. 😄\n\nMe diz: com tantos aplicativos, sites e IAs surgindo, você também sente que é difícil escolher por onde começar?';
+  }
+  if (stage === 'overload') {
+    state.overload = understandOverload(t);
+    state.stage = 'goal';
+    if (state.overload === 'sim') return 'Exatamente. Às vezes o problema nem é falta de recursos — é descobrir qual faz sentido para o que a gente quer fazer.\n\nE hoje, o que você gostaria de conseguir fazer com mais facilidade?';
+    if (state.overload === 'nao') return 'Boa! Se você já sabe escolher suas ferramentas, melhor ainda. Um hub pode servir mais como atalho para descobrir recursos novos do que como solução para uma dificuldade.\n\nQue tipo de projeto ou tarefa mais te interessa atualmente?';
+    return 'Entendi. Depende muito da tarefa, né?\n\nSe fosse escolher uma coisa para facilitar com tecnologia agora, qual seria?';
+  }
+  if (stage === 'goal') {
+    if (explicitNoInterest(t) || /^(nada|nenhuma|nenhum|nao preciso|nao quero|deixa pra la|dispenso)$/.test(t)) return endConversation();
+    const goal = detectGoal(t);
+    if (goal.id === 'geral' && (/^(nao sei|sei la|nenhuma ideia|tanto faz|qualquer coisa)$/.test(t))) {
+      state.attempts.goal++;
+      if (state.attempts.goal === 1) return 'Normal não ter um objetivo definido agora. Pense em algo que toma seu tempo: estudar, organizar arquivos, escrever, planejar ou criar.\n\nQual desses tipos de tarefa aparece mais na sua rotina? Responda do seu jeito.';
+      state.stage = 'offer';
+      return 'Sem problemas. Uma forma simples de descobrir é passear por uma seleção de ferramentas e ver o que chama sua atenção.\n\nFoi para isso que o Hub Nexus foi criado. Quer conhecer?';
+    }
+    state.goal = goal.id;
+    state.goalText = raw.slice(0, 240);
+    state.stage = 'offer';
+    if (goal.id === 'geral') return 'Interessante. Pelo que você contou, vale começar explorando sem tentar abraçar tudo ao mesmo tempo.\n\nFoi pensando nisso que surgiu o Hub Nexus: uma central para encontrar recursos digitais organizados. Quer que eu te mostre?';
+    return `Agora fez sentido! Você está olhando para ${goal.title}.\n\nUma possibilidade seria ${goal.idea}. Foi justamente pensando em caminhos assim que o Hub Nexus reuniu recursos digitais em um só lugar.\n\nQuer dar uma olhada?`;
+  }
+  if (stage === 'offer') {
+    if (shortNo(t) || explicitNoInterest(t) || /^prefiro (nao|deixar)|^dispenso/.test(t)) return endConversation();
+    if (shortYes(t) || /\b(quero (conhecer|ver|acessar|olhar)|tenho interesse|me mostra|pode mostrar|bora conhecer|gostei da ideia)\b/.test(t)) {
+      showAccess();
+      const detail = goalDetails();
+      return `Show${person()}! 😄 Vou te encaminhar para o Hub Nexus.\n\nComo você comentou sobre ${detail.title}, minha sugestão é começar procurando recursos para ${detail.idea}.\n\nO link está no cartão abaixo. Pode explorar com calma e continuar perguntando por aqui.`;
+    }
+    if (uncertain(t) || /\b(talvez|depende|nao sei|pode ser|me convence|vale a pena)\b/.test(t)) {
+      state.attempts.offer++;
+      if (state.attempts.offer >= 2) return 'Não precisa decidir agora. Se quiser experimentar mais tarde, basta escrever “link”. A conversa pode continuar por outro assunto também.';
+      return `Faz sentido pensar antes. O Nexus não resolve tudo sozinho: ele organiza pontos de partida. Para ${goalDetails().title}, por exemplo, o primeiro passo pode ser ${goalDetails().idea}.\n\nVocê prefere conhecer a página ou encerrar por aqui?`;
+    }
+    const found = detectGoal(t);
+    if (found.id !== 'geral') {
+      state.goal = found.id;
+      return `Boa, você trouxe outro contexto: ${found.title}. Para isso, eu começaria tentando ${found.idea}.\n\nQuer explorar as opções no Nexus?`;
+    }
+    state.attempts.offer++;
+    if (state.attempts.offer >= 3) return 'Acho que não fui claro. O Nexus é uma central de ferramentas de IA e produtividade. Se quiser ver com seus próprios olhos, escreva “link”. Sem compromisso.';
+    return 'Pode falar mais sobre o que você está pensando? Eu consigo explicar melhor o hub ou, se preferir, enviar o endereço direto.';
+  }
+  if (stage === 'access') {
+    if (/\b(e voce|como voce esta|tudo bem com voce)\b/.test(t)) return 'Por aqui eu sigo pronto para ajudar no que precisar. 😄 Se me disser um objetivo prático, posso sugerir por onde começar.';
+    if (t === 'obrigado' || t === 'valeu' || t === 'show' || t === 'ok') return 'Por nada! 😄 Boa exploração. Se me contar o que procura, posso ajudar a definir uma primeira experiência.';
+    const found = detectGoal(t);
+    if (found.id !== 'geral') {
+      state.goal = found.id;
+      return `Para ${found.title}, sugiro começar com uma tarefa pequena: ${found.idea}. Você pode explorar o hub pelo link acima e conferir quais recursos atendem melhor a isso. Quer me dizer um exemplo específico?`;
+    }
+    return 'Estou aqui. 😊 Você pode me perguntar como o hub funciona, falar de uma necessidade sua ou pedir um diagnóstico conversado. O link continua disponível no cartão.';
+  }
+  return 'Pode me contar um pouco mais? Quero entender o que você procura antes de recomendar qualquer ferramenta.';
+}
+
+// Opcional: substitui o texto do motor local por uma resposta gerada por IA
+// em um backend de sua confiança. O fluxo, o respeito ao “não” e o CTA
+// continuam controlados localmente. Nunca coloque chave de IA neste arquivo.
+async function optionallyEnrich(localText, userText, currentStage) {
+  if (!AI_API_URL || state.stage === 'closed') return localText;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 7000);
+    let res;
+    try {
+      res = await fetch(AI_API_URL, {
+        method:'POST', headers:{'Content-Type':'application/json'}, signal:controller.signal,
+        body:JSON.stringify({
+          message:userText, draft:localText, phase:currentStage,
+          context:{name:state.name, objective:state.goal, objection:state.lastTopic, stage:state.stage},
+          history:state.messages.slice(-10)
+        })
+      });
+    } finally { clearTimeout(timeout); }
+    if (!res.ok) return localText;
+    const data = await res.json();
+    return typeof data.reply === 'string' && data.reply.trim() ? data.reply.slice(0,1300) : localText;
+  } catch(e) { console.warn('IA externa não disponível. Resposta local utilizada.', e); return localText; }
+}
+async function sendText() {
+  const raw = dom.input.value.trim();
+  if (!raw || state.busy) return;
+  state.busy = true;
+  dom.input.value = '';
+  dom.input.disabled = true;
+  dom.send.disabled = true;
+  dom.status.textContent = 'Nexus está respondendo…';
+  try {
+    await renderMessage(raw.slice(0,600), 'user');
+    const beforeStage = state.stage;
+    const localText = await localReply(raw.slice(0,600));
+    const finalText = await optionallyEnrich(localText, raw.slice(0,600), beforeStage);
+    await renderMessage(finalText, 'assistant');
+  } catch (err) {
+    console.error(err);
+    await renderMessage('Tive uma dificuldade para responder agora. Pode tentar novamente?', 'assistant');
+  } finally {
+    state.busy = false;
+    dom.input.disabled = false;
+    dom.send.disabled = false;
+    dom.status.textContent = 'Assistente virtual • conversa contextual';
+    dom.input.focus({preventScroll:true});
+    scrollDown();
+  }
+}
+function resetConversation(clearMessages = true) {
+  state.stage = 'mood'; state.name=''; state.mood=''; state.tech='unknown';
+  state.overload='unknown'; state.goal='geral'; state.goalText=''; state.experience='';
+  state.attempts={name:0,goal:0,offer:0,unknown:0};
+  state.diagnostic=[]; state.diagnosticIndex=0; state.lastTopic=''; state.linkShown=false;
+  dom.card.style.display='none';
+  if (clearMessages) {
+    for (const el of dom.chat.querySelectorAll('.message')) el.remove();
+    state.messages=[];
+  }
+}
+dom.send.addEventListener('click', sendText);
+dom.input.addEventListener('keydown', event => {
+  if (event.key === 'Enter' && !event.isComposing) { event.preventDefault(); sendText(); }
+});
+dom.reset.addEventListener('click', () => {
+  if (state.busy) return;
+  resetConversation();
+  renderMessage('E aí! 😄 Que bom te ver por aqui. Eu sou o assistente virtual do Nexus.\n\nComo está seu dia?', 'assistant').then(() => dom.input.focus());
+});
+window.addEventListener('load', async () => {
+  if (AI_API_URL) dom.hint.textContent = 'Conversa digitada com IA conectada a um servidor. Evite dados sensíveis; leia a política de privacidade do site.';
+  dom.hub.href = HUB_URL;
+  dom.hub.target = '_blank';
+  dom.hub.rel = 'noopener noreferrer';
+  await renderMessage('E aí! 😄 Que bom te ver por aqui. Eu sou o assistente virtual do Nexus.\n\nAntes de falar de tecnologia, me conta: como está seu dia?', 'assistant');
+  dom.input.focus({preventScroll:true});
+});
+
+  </script>
+</body>
+</html>
